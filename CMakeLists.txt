@@ -71,7 +71,10 @@ juce_generate_juce_header(PhysicalEducation)
 
 target_sources(PhysicalEducation
         PRIVATE
-        Source/PluginProcessor.cpp)
+        Source/PluginProcessor.cpp
+        Source/PhysEdVoice.cpp
+        Source/Resonators/Resonator.cpp
+        Source/Resonators/StiffString.cpp)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -106,7 +109,7 @@ target_link_libraries(PhysicalEducation
         PRIVATE
         # AudioPluginData           # If we'd created a binary data target, we'd link to it here
         juce::juce_audio_utils
-#        juce::juce_dsp
+        juce::juce_dsp
         PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

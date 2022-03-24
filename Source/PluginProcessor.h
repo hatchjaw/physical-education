@@ -69,7 +69,7 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 private:
-    juce::Synthesiser peSynth;
+    juce::Synthesiser physEdSynth;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //==============================================================================

@@ -7,6 +7,9 @@
 */
 
 #include "PluginProcessor.h"
+#include "PhysEdSound.h"
+#include "PhysEdVoice.h"
+#include "Resonators/StiffString.h"
 
 //==============================================================================
 PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
@@ -21,6 +24,15 @@ PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
 ), apvts(*this, nullptr, "Parameters", PhysicalEducationAudioProcessor::createParams())
 #endif
 {
+    physEdSynth.addSound(new PhysEdSound());
+
+    for (int i = 0; i < NUM_VOICES; ++i) {
+        // Create a voice.
+        auto voice = new PhysEdVoice();
+        voice->setResonator(new StiffString());
+        // Add the voice to the synth.
+        physEdSynth.addVoice(voice);
+    }
 }
 
 PhysicalEducationAudioProcessor::~PhysicalEducationAudioProcessor() {
@@ -80,12 +92,12 @@ void PhysicalEducationAudioProcessor::changeProgramName(int index, const juce::S
 
 //==============================================================================
 void PhysicalEducationAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
-    peSynth.setCurrentPlaybackSampleRate(sampleRate);
+    physEdSynth.setCurrentPlaybackSampleRate(sampleRate);
 
-    for (int i = 0; i < peSynth.getNumVoices(); ++i) {
-//        if (auto voice = dynamic_cast<KsVoice *>(peSynth.getVoice(i))) {
-//            voice->prepareToPlay(sampleRate, samplesPerBlock, this->getTotalNumOutputChannels());
-//        }
+    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
+            voice->prepareToPlay(sampleRate, samplesPerBlock, this->getTotalNumOutputChannels());
+        }
     }
 }
 
@@ -129,22 +141,23 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    for (int i = 0; i < peSynth.getNumVoices(); ++i) {
-//        if (auto voice = dynamic_cast<peVoice *>(peSynth.getVoice(i))) {
-//            voice->setExcitationMode(excitationMode);
-//            voice->enableExcitationEnvelope(excitationEnvelopeOn);
-//            voice->setExcitationEnvelope(excitationAdsrParams);
-//            voice->updateSympatheticResonators(sympathetic1Freq,
-//                                               sympathetic1Amount,
-//                                               sympathetic2Freq,
-//                                               sympathetic2Amount);
-//            voice->updateStretchFactor(stretchFactor);
-//            voice->updatePrimaryInharmonicity(inharmonicity1Gain, inharmonicity1Order);
-//            voice->updateMutePrimary(sympatheticOnly);
-//        }
-    }
+    // Update parameters
+//    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
+////        if (auto voice = dynamic_cast<peVoice *>(peSynth.getVoice(i))) {
+////            voice->setExcitationMode(excitationMode);
+////            voice->enableExcitationEnvelope(excitationEnvelopeOn);
+////            voice->setExcitationEnvelope(excitationAdsrParams);
+////            voice->updateSympatheticResonators(sympathetic1Freq,
+////                                               sympathetic1Amount,
+////                                               sympathetic2Freq,
+////                                               sympathetic2Amount);
+////            voice->updateStretchFactor(stretchFactor);
+////            voice->updatePrimaryInharmonicity(inharmonicity1Gain, inharmonicity1Order);
+////            voice->updateMutePrimary(sympatheticOnly);
+////        }
+//    }
 
-    peSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    physEdSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
 //==============================================================================
