@@ -72,9 +72,11 @@ juce_generate_juce_header(PhysicalEducation)
 target_sources(PhysicalEducation
         PRIVATE
         Source/PluginProcessor.cpp
+        Source/PluginEditor.cpp
         Source/PhysEdVoice.cpp
         Source/Resonators/Resonator.cpp
-        Source/Resonators/StiffString.cpp)
+        Source/Resonators/StiffString.cpp
+        Source/UI/DisplacementVisualiserComponent.cpp)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use

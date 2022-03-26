@@ -82,3 +82,7 @@ void PhysEdVoice::renderNextBlock(
 void PhysEdVoice::setResonator(Resonator *resonatorToUse) {
     this->resonator = resonatorToUse;
 }
+
+double *&PhysEdVoice::getResonatorState() {
+    return this->resonator->getState();
+}

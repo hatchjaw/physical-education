@@ -9,6 +9,7 @@
 #include "../Utils.h"
 
 Resonator::Resonator(std::pair<int, int> stencil) : stencilDimensions(std::move(stencil)) {
+    initialiseState();
 }
 
 void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
@@ -52,7 +53,7 @@ void Resonator::excite(float position, int width, float force) {
     }
 }
 
-float Resonator::getOutput() {
+FType Resonator::getOutput() {
     return u[1][outputIndex];
 }
 
@@ -68,4 +69,26 @@ void Resonator::initialiseState() {
             u[n][l] = 0.0;
         }
     }
+
+//    u.resize(stencilDimensions.second);
+//    this->uStates.resize(stencilDimensions.second, std::vector<FType>(N + 1, 0.0));
+//    for (unsigned long i = 0; i < 3; ++i) {
+//        u[i] = &uStates[i][0];
+//    }
+}
+
+double *&Resonator::getState() {
+    return u[1];
+}
+
+void Resonator::advanceTimestep() {
+    // Swap pointers to advance the time-step.
+    auto uTemp = u[0];
+    u[0] = u[1];
+    u[1] = u[2];
+    u[2] = uTemp;
+}
+
+void Resonator::updateState() {
+    advanceTimestep();
 }

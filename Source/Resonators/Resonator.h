@@ -47,14 +47,16 @@ public:
     /**
      * Update the displacement of the resonator model by a single time-step.
      */
-    virtual void updateState() = 0;
+    virtual void updateState();
 
     /**
      * Get the current displacement of the output grid-point.
      *
      * @return The displacement of the output grid-point.
      */
-    float getOutput();
+    FType getOutput();
+
+    double *&getState();
 
 protected:
     /**
@@ -92,8 +94,11 @@ protected:
      * State pointers. To be treated as a circular buffer of states.
      */
     std::vector<FType *> u;
+    std::vector<std::vector<FType>> uStates;
 private:
     void initialiseState();
+
+    void advanceTimestep();
 
     int outputIndex{0};
 };

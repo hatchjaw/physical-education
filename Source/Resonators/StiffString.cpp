@@ -84,9 +84,5 @@ void StiffString::updateState() {
                   coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
     }
 
-    // Swap pointers to advance the time-step.
-    auto uTemp = u[0];
-    u[0] = u[1];
-    u[1] = u[2];
-    u[2] = uTemp;
+    Resonator::updateState();
 }

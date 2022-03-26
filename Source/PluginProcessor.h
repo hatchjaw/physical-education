@@ -68,6 +68,9 @@ public:
     void setStateInformation(const void *data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState apvts;
+
+    double *&getModelState() noexcept;
+
 private:
     juce::Synthesiser physEdSynth;
 

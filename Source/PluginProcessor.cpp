@@ -10,6 +10,7 @@
 #include "PhysEdSound.h"
 #include "PhysEdVoice.h"
 #include "Resonators/StiffString.h"
+#include "PluginEditor.h"
 
 //==============================================================================
 PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
@@ -133,7 +134,8 @@ bool PhysicalEducationAudioProcessor::isBusesLayoutSupported(const BusesLayout &
 
 #endif
 
-void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) {
+void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
+                                                   juce::MidiBuffer &midiMessages) {
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -166,10 +168,12 @@ bool PhysicalEducationAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor *PhysicalEducationAudioProcessor::createEditor() {
-    // Let JUCE create a generic UI
-    auto editor = new juce::GenericAudioProcessorEditor(*this);
-    editor->setSize(450, 585);
-    return editor;
+//    // Let JUCE create a generic UI
+//    auto editor = new juce::GenericAudioProcessorEditor(*this);
+//    editor->setSize(450, 585);
+//    return editor;
+
+    return new PhysicalEducationAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -184,10 +188,20 @@ void PhysicalEducationAudioProcessor::setStateInformation(const void *data, int 
     // whose contents will have been created by the getStateInformation() call.
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout PhysicalEducationAudioProcessor::createParams() {
+juce::AudioProcessorValueTreeState::ParameterLayout
+PhysicalEducationAudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
     return {params.begin(), params.end()};
+}
+
+double *&PhysicalEducationAudioProcessor::getModelState() noexcept {
+    // Get first (only?) voice, then get the pointer to its state.
+    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
+            return voice->getResonatorState();
+        }
+    }
 }
 
 //==============================================================================

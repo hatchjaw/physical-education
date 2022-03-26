@@ -33,6 +33,8 @@ public:
 
     void setResonator(Resonator *resonatorToUse);
 
+    double *&getResonatorState();
+
 private:
     bool isPrepared;
     Resonator *resonator;
