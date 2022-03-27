@@ -69,7 +69,12 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 
-    double *&getModelState() noexcept;
+    /**
+     *
+     * @return A reference to the state of the underlying physical model,
+     * e.g. for visualisation.
+     */
+    std::vector<double> &getModelState() noexcept;
 
 private:
     juce::Synthesiser physEdSynth;

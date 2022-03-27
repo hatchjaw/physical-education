@@ -10,7 +10,7 @@
 class DisplacementVisualiserComponent : public juce::Component,
                                         public Timer {
 public:
-    DisplacementVisualiserComponent(double *&);
+    DisplacementVisualiserComponent(std::vector<double> &);
 
     ~DisplacementVisualiserComponent() override;
 
@@ -24,7 +24,7 @@ public:
     juce::Path visualiseState(juce::Graphics &);
 
 private:
-    double *&displacement;
+    std::vector<double> &displacement;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DisplacementVisualiserComponent)
 };
 

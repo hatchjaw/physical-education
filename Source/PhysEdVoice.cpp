@@ -83,6 +83,7 @@ void PhysEdVoice::setResonator(Resonator *resonatorToUse) {
     this->resonator = resonatorToUse;
 }
 
-double *&PhysEdVoice::getResonatorState() {
+
+std::vector<double> &PhysEdVoice::getResonatorState() {
     return this->resonator->getState();
 }

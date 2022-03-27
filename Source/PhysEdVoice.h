@@ -33,7 +33,11 @@ public:
 
     void setResonator(Resonator *resonatorToUse);
 
-    double *&getResonatorState();
+    /**
+     *
+     * @return A reference to a vector in the resonator's vector of state vectors.
+     */
+    std::vector<double> &getResonatorState();
 
 private:
     bool isPrepared;

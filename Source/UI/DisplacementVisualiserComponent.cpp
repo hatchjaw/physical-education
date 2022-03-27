@@ -4,7 +4,7 @@
 
 #include "DisplacementVisualiserComponent.h"
 
-DisplacementVisualiserComponent::DisplacementVisualiserComponent(double *&modelState) :
+DisplacementVisualiserComponent::DisplacementVisualiserComponent(std::vector<double> &modelState) :
         displacement(modelState) {
     this->startTimerHz(15);
 }
@@ -25,6 +25,11 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
 void DisplacementVisualiserComponent::resized() {}
 
 juce::Path DisplacementVisualiserComponent::visualiseState(juce::Graphics &g) {
+    // Make a copy of the displacement vector for this iteration, otherwise the
+    // values will probably be overwritten while the path is being constructed
+    // and visual discontinuities will result. (NB, might not actually work.)
+    auto u = this->displacement;
+
     // we have to scale up the state of the system from 'transverse
     // displacement' to 'pixels'
     auto visualScaling = 200.f;
@@ -36,19 +41,20 @@ juce::Path DisplacementVisualiserComponent::visualiseState(juce::Graphics &g) {
     juce::Path stringPath;
 
     // Start path
-    stringPath.startNewSubPath(0, static_cast<float>(-this->displacement[0]) * visualScaling +
-                                                     stringBoundaries);
-    auto N = 50;
+    stringPath.startNewSubPath(0, static_cast<float>(-u[0]) * visualScaling +
+                                  stringBoundaries);
+    auto N = this->displacement.size();
 
-    // Visual spacing between two grid points
-    auto spacing = static_cast<float>(this->getWidth()) / static_cast<float>(N);
+    // Visual spacing between grid points
+    auto spacing = static_cast<float>(this->getWidth()) / static_cast<float>(N - 1);
     auto x = spacing;
 
-    for (int l = 1; l <= N; l++) {
-        // Needs to be -u, because a positive u would visually go down
-        auto newY = static_cast<float>(-this->displacement[l]) * visualScaling + stringBoundaries;
+    for (unsigned long l = 1; l < N; l++) {
+        // Displacement needs to be negative, because a positive displacement
+        // would visually go down.
+        auto newY = static_cast<float>(-u[l]) * visualScaling + stringBoundaries;
 
-        // if we get NAN values, make sure that we don't get an exception
+        // Prevent NaN values throwing an exception.
         if (isnan(newY)) {
             newY = 0;
         }

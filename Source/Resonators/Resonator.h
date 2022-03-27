@@ -56,7 +56,11 @@ public:
      */
     FType getOutput();
 
-    double *&getState();
+    /**
+     *
+     * @return A reference to a vector in vector of state vectors.
+     */
+    std::vector<FType> &getState();
 
 protected:
     /**
@@ -96,8 +100,14 @@ protected:
     std::vector<FType *> u;
     std::vector<std::vector<FType>> uStates;
 private:
+    /**
+     * Set the size of the state vectors and fill with zeros.
+     */
     void initialiseState();
 
+    /**
+     * Advance the timestep by swapping pointers to state vectors.
+     */
     void advanceTimestep();
 
     int outputIndex{0};

@@ -9,7 +9,7 @@
 #include "../Utils.h"
 
 Resonator::Resonator(std::pair<int, int> stencil) : stencilDimensions(std::move(stencil)) {
-    initialiseState();
+    u.resize(stencilDimensions.second);
 }
 
 void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
@@ -62,23 +62,17 @@ FType Resonator::t60ToSigma(FType t60) {
 }
 
 void Resonator::initialiseState() {
-    u.resize(stencilDimensions.second);
-    for (int n = 0; n < stencilDimensions.second; ++n) {
-        u[n] = new FType[N + 1];
-        for (int l = 0; l < N + 1; ++l) {
-            u[n][l] = 0.0;
-        }
+    // Resize and initialise uStates.
+    uStates.resize(stencilDimensions.second, std::vector<FType>(N + 1, 0.0));
+    // Point each element in u to the address of the start of the corresponding
+    // vector in uStates.
+    for (unsigned long i = 0; i < stencilDimensions.second; ++i) {
+        u[i] = &uStates[i][0];
     }
-
-//    u.resize(stencilDimensions.second);
-//    this->uStates.resize(stencilDimensions.second, std::vector<FType>(N + 1, 0.0));
-//    for (unsigned long i = 0; i < 3; ++i) {
-//        u[i] = &uStates[i][0];
-//    }
 }
 
-double *&Resonator::getState() {
-    return u[1];
+std::vector<FType> &Resonator::getState(){
+    return uStates[1];
 }
 
 void Resonator::advanceTimestep() {
