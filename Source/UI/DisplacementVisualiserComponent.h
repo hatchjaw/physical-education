@@ -8,7 +8,7 @@
 #include <JuceHeader.h>
 
 class DisplacementVisualiserComponent : public juce::Component,
-                                        public Timer {
+                                        public juce::Timer {
 public:
     DisplacementVisualiserComponent(std::vector<double> &);
 
@@ -21,9 +21,9 @@ public:
     // The timer callback function that updates the graphics.
     void timerCallback() override;
 
-    juce::Path visualiseState(juce::Graphics &);
-
 private:
+    juce::Path generateStatePath();
+
     std::vector<double> &displacement;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DisplacementVisualiserComponent)
 };

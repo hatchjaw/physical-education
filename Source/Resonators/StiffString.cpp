@@ -61,6 +61,8 @@ void StiffString::computeCoefficients() {
 }
 
 void StiffString::updateState() {
+    jassert(isInitialised);
+
     // Handle boundary conditions (simply-supported)
     int l = 1;
     u[2][l] = coeffs[1] * u[1][l] +

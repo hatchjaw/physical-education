@@ -8,7 +8,8 @@
 #include "Resonator.h"
 #include "../Utils.h"
 
-Resonator::Resonator(std::pair<int, int> stencil) : stencilDimensions(std::move(stencil)) {
+Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil) :
+        stencilDimensions(std::move(stencil)) {
     u.resize(stencilDimensions.second);
 }
 
@@ -27,9 +28,12 @@ void Resonator::initialiseModel(FType sampleRate) {
     k = 1.0 / sampleRate;
     computeCoefficients();
     initialiseState();
+    isInitialised = true;
 }
 
 void Resonator::excite(float position, int width, float force) {
+    jassert(isInitialised);
+
     // Keep the with sensible relative to the total number of grid-points, and
     // respect the boundary conditions.
     if (width > N - 3) {
@@ -54,6 +58,7 @@ void Resonator::excite(float position, int width, float force) {
 }
 
 FType Resonator::getOutput() {
+    jassert(isInitialised);
     return u[1][outputIndex];
 }
 
@@ -71,11 +76,13 @@ void Resonator::initialiseState() {
     }
 }
 
-std::vector<FType> &Resonator::getState(){
+std::vector<FType> &Resonator::getState() {
+    jassert(isInitialised);
     return uStates[1];
 }
 
 void Resonator::advanceTimestep() {
+    jassert(isInitialised);
     // Swap pointers to advance the time-step.
     auto uTemp = u[0];
     u[0] = u[1];

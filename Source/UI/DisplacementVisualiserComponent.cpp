@@ -16,7 +16,7 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
     g.setColour(Colours::cyan);
 
     // Generate the path that visualises the state of the system.
-    auto visualStatePath = visualiseState(g);
+    auto visualStatePath = generateStatePath();
 
     // Draw the path using a stroke (thickness) of 2 pixels.
     g.strokePath(visualStatePath, PathStrokeType(2.0f));
@@ -24,11 +24,12 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
 
 void DisplacementVisualiserComponent::resized() {}
 
-juce::Path DisplacementVisualiserComponent::visualiseState(juce::Graphics &g) {
+juce::Path DisplacementVisualiserComponent::generateStatePath() {
     // Make a copy of the displacement vector for this iteration, otherwise the
     // values will probably be overwritten while the path is being constructed
-    // and visual discontinuities will result. (NB, might not actually work.)
-    auto u = this->displacement;
+    // and visual discontinuities will result.
+    std::vector<double> u(this->displacement.size());
+    std::copy(this->displacement.begin(), this->displacement.end(), u.begin());
 
     // we have to scale up the state of the system from 'transverse
     // displacement' to 'pixels'
@@ -43,7 +44,7 @@ juce::Path DisplacementVisualiserComponent::visualiseState(juce::Graphics &g) {
     // Start path
     stringPath.startNewSubPath(0, static_cast<float>(-u[0]) * visualScaling +
                                   stringBoundaries);
-    auto N = this->displacement.size();
+    auto N = u.size();
 
     // Visual spacing between grid points
     auto spacing = static_cast<float>(this->getWidth()) / static_cast<float>(N - 1);

@@ -16,7 +16,7 @@ public:
      * Resonator constructor
      * @param stencil
      */
-    explicit Resonator(std::pair<int, int> stencil);
+    explicit Resonator(std::pair<unsigned int, unsigned int> stencil);
 
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
@@ -80,7 +80,7 @@ protected:
     /**
      * Dimensions of the model's grid stencil.
      */
-    std::pair<int, int> stencilDimensions;
+    std::pair<unsigned int, unsigned int> stencilDimensions;
     /**
      * Model parameters. Time-step, 60 dB decay time, 60 dB frequency-dependent decay time.
      * NB. for stability, T60_1 should be greater than T60_0.
@@ -99,6 +99,8 @@ protected:
      */
     std::vector<FType *> u;
     std::vector<std::vector<FType>> uStates;
+
+    bool isInitialised{false};
 private:
     /**
      * Set the size of the state vectors and fill with zeros.
