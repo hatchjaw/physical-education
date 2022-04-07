@@ -13,7 +13,7 @@ DisplacementVisualiserComponent::~DisplacementVisualiserComponent() = default;
 
 void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
     // Set the colour of the path
-    g.setColour(Colours::cyan);
+    g.setColour(Colours::lightskyblue);
 
     // Generate the path that visualises the state of the system.
     auto visualStatePath = generateStatePath();

@@ -23,7 +23,7 @@ void StiffString::computeCoefficients() {
     auto sigma1 = t60ToSigma(T60_1);
 
     // Grid-spacing, from stability condition.
-    auto hh = powf(c, 2) * powf(k, 2) + (4 * sigma0 * k);
+    auto hh = powf(c, 2) * powf(k, 2) + (4 * sigma1 * k);
     auto hhh = sqrt(powf(hh, 2) + (16 * powf(kappa, 2) * powf(k, 2)));
     auto h = sqrt((hh + hhh) / 2);
     // Calculate the closest integer N such that h ≥ [stability condition]
