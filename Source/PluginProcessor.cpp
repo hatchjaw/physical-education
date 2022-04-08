@@ -11,6 +11,7 @@
 #include "PhysEdVoice.h"
 #include "Resonators/StiffString.h"
 #include "PluginEditor.h"
+#include "Exciters/RaisedCosine.h"
 
 //==============================================================================
 PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
@@ -30,7 +31,7 @@ PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
     for (int i = 0; i < NUM_VOICES; ++i) {
         // Create a voice.
         auto voice = new PhysEdVoice();
-        voice->setResonator(new StiffString());
+        voice->setResonator(new StiffString(new RaisedCosine()));
         // Add the voice to the synth.
         physEdSynth.addVoice(voice);
     }

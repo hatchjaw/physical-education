@@ -74,6 +74,8 @@ target_sources(PhysicalEducation
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp
         Source/PhysEdVoice.cpp
+        Source/Exciters/Exciter.cpp
+        Source/Exciters/RaisedCosine.cpp
         Source/Resonators/Resonator.cpp
         Source/Resonators/StiffString.cpp
         Source/UI/DisplacementVisualiserComponent.cpp)

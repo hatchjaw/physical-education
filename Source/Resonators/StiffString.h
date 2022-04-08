@@ -10,9 +10,7 @@
 
 class StiffString : public Resonator {
 public:
-    StiffString();
-
-    void updateState() override;
+    explicit StiffString(Exciter *exciterToUse);
 
     void setWavespeed(FType newWavespeed);
 
@@ -20,6 +18,8 @@ public:
 
 private:
     void computeCoefficients() override;
+
+    void computeScheme() override;
 
     /**
      * Model parameters. Wave propagation speed (m/s), combined string stiffness parameter.

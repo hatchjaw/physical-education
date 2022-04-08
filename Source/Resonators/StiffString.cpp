@@ -5,7 +5,8 @@
 #include <cmath>
 #include "StiffString.h"
 
-StiffString::StiffString() : Resonator(std::make_pair(5, 3)) {
+StiffString::StiffString(Exciter *exciterToUse) :
+        Resonator(std::make_pair(5, 3), exciterToUse) {
 }
 
 void StiffString::setWavespeed(FType newWavespeed) {
@@ -23,20 +24,20 @@ void StiffString::computeCoefficients() {
     auto sigma1 = t60ToSigma(T60_1);
 
     // Grid-spacing, from stability condition.
-    auto hh = powf(c, 2) * powf(k, 2) + (4 * sigma1 * k);
-    auto hhh = sqrt(powf(hh, 2) + (16 * powf(kappa, 2) * powf(k, 2)));
+    auto hh = pow(c, 2) * pow(k, 2) + (4 * sigma1 * k);
+    auto hhh = sqrt(pow(hh, 2) + (16 * pow(kappa, 2) * pow(k, 2)));
     auto h = sqrt((hh + hhh) / 2);
     // Calculate the closest integer N such that h ≥ [stability condition]
-    N = static_cast<int>(floor(L / h));
+    N = static_cast<unsigned int>(floor(L / h));
     // Recalculate grid-spacing from final N.
     h = L / static_cast<float>(N);
 
     // Compute model coefficients.
-    auto hSq = powf(h, 2);
+    auto hSq = pow(h, 2);
     auto lambda = (k * c) / h;
-    auto lambdaSq = powf(lambda, 2);
+    auto lambdaSq = pow(lambda, 2);
     auto mu = (kappa * k) / hSq;
-    auto muSq = powf(mu, 2);
+    auto muSq = pow(mu, 2);
     auto nu = (2 * sigma1 * k) / hSq;
 
     coeffs = {
@@ -60,16 +61,15 @@ void StiffString::computeCoefficients() {
     }
 }
 
-void StiffString::updateState() {
-    jassert(isInitialised);
-
+void StiffString::computeScheme() {
     // Handle boundary conditions (simply-supported)
-    int l = 1;
+    unsigned int l = 1;
     u[2][l] = coeffs[1] * u[1][l] +
               coeffs[2] * u[0][l] +
               coeffs[3] * u[1][l + 2] +
               coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
               coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
+
     l = N - 1;
     u[2][l] = coeffs[1] * u[1][l] +
               coeffs[2] * u[0][l] +
@@ -85,6 +85,4 @@ void StiffString::updateState() {
                   coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
                   coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
     }
-
-    Resonator::updateState();
 }

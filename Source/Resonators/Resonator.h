@@ -7,6 +7,7 @@
 
 #include <JuceHeader.h>
 #include <vector>
+#include "../Exciters/Exciter.h"
 
 using FType = double;
 
@@ -15,8 +16,9 @@ public:
     /**
      * Resonator constructor
      * @param stencil
+     * @param exciterToUse
      */
-    explicit Resonator(std::pair<unsigned int, unsigned int> stencil);
+    explicit Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse);
 
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
@@ -30,6 +32,12 @@ public:
     void setOutputPosition(float outputPosition);
 
     /**
+     * Set the resonator's exciter.
+     * @param exciterToUse
+     */
+    void setExciter(Exciter *exciterToUse);
+
+    /**
      * Initialise the model -- compute coefficients and initialise state.
      *
      * @param sampleRate
@@ -37,12 +45,13 @@ public:
     virtual void initialiseModel(FType sampleRate);
 
     /**
-     * Excite the system with a raised cosine.
-     * TODO: currently instantaneous; implement progressive excitation.
+     * Excite the system.
+     *
      * @param position
      * @param force
+     * @param velocity
      */
-    void excite(float position = .5f, int width = 10, float force = 1.f);
+    void excite(float position = .5f, float force = 1.f, float velocity = 1.f);
 
     /**
      * Update the displacement of the resonator model by a single time-step.
@@ -76,6 +85,11 @@ protected:
      */
     virtual void computeCoefficients() = 0;
 
+    /**
+     * Compute a single-timestep update of the scheme.
+     */
+    virtual void computeScheme() = 0;
+
     const FType L{1.0};
     /**
      * Dimensions of the model's grid stencil.
@@ -93,7 +107,7 @@ protected:
     /**
      * Number of position grid-points.
      */
-    int N;
+    unsigned int N;
     /**
      * State pointers. To be treated as a circular buffer of states.
      */
@@ -113,6 +127,8 @@ private:
     void advanceTimestep();
 
     int outputIndex{0};
+
+    Exciter *exciter;
 };
 
 

@@ -8,8 +8,9 @@
 #include "Resonator.h"
 #include "../Utils.h"
 
-Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil) :
-        stencilDimensions(std::move(stencil)) {
+Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse) :
+        stencilDimensions(std::move(stencil)),
+        exciter(exciterToUse) {
     u.resize(stencilDimensions.second);
 }
 
@@ -24,37 +25,22 @@ void Resonator::setOutputPosition(float outputPosition) {
     outputIndex = static_cast<int>(round(static_cast<float>(N) * outputPosition));
 }
 
+void Resonator::setExciter(Exciter *exciterToUse) {
+    this->exciter = exciterToUse;
+}
+
 void Resonator::initialiseModel(FType sampleRate) {
     k = 1.0 / sampleRate;
     computeCoefficients();
+    exciter->setNumGridPoints(N);
     initialiseState();
     isInitialised = true;
 }
 
-void Resonator::excite(float position, int width, float force) {
+void Resonator::excite(float position, float force, float velocity) {
     jassert(isInitialised);
 
-    // Keep the with sensible relative to the total number of grid-points, and
-    // respect the boundary conditions.
-    if (width > N - 3) {
-        width = N - 3;
-    }
-    auto halfWidth = .5f * width;
-    // No need to repeatedly calculate force/2 in the loop, so do it here.
-    auto forceToUse = .5f * force;
-    // Calculate the excitation position as a proportion of N.
-    auto pos = Utils::clamp(position, 0.f, 1.f);
-    // Find the nearest integer start index; also ensure the excitation can't
-    // exceed the bounds of the grid, and respect the boundary conditions.
-    auto start = std::min(
-            std::max(static_cast<int>(floor(N * pos - halfWidth)), 2),
-            N - width
-    );
-
-    // Apply the excitation by adding displacement to the identified range of grid-points.
-    for (int l = 0; l < width; ++l) {
-        u[1][l + start] += forceToUse * (1 - cos((M_PI * l) / halfWidth));
-    }
+    exciter->initialiseExcitation(position, force, velocity);
 }
 
 FType Resonator::getOutput() {
@@ -91,5 +77,8 @@ void Resonator::advanceTimestep() {
 }
 
 void Resonator::updateState() {
+    jassert(isInitialised);
+    computeScheme();
+    exciter->applyExcitation(u);
     advanceTimestep();
 }

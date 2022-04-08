@@ -7,8 +7,7 @@
 #include "Resonators/StiffString.h"
 #include "Utils.h"
 
-PhysEdVoice::~PhysEdVoice() {
-}
+PhysEdVoice::~PhysEdVoice() = default;
 
 bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
     return dynamic_cast<PhysEdSound *>(sound) != nullptr;
@@ -27,7 +26,7 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
 
 void PhysEdVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound *sound,
                             int currentPitchWheelPosition) {
-    this->resonator->excite(.5, 10, .1f * velocity);
+    this->resonator->excite(static_cast<float>(midiNoteNumber) / 128.f, velocity, velocity);
 }
 
 void PhysEdVoice::stopNote(float velocity, bool allowTailOff) {
