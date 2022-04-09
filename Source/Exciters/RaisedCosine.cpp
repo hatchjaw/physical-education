@@ -17,7 +17,7 @@ void RaisedCosine::initialiseExcitation(float excitationPosition,
     auto p = resonatorParameters.derived;
     auto excitationWidth = Utils::clamp(
             floor((p.N * WIDTH_SCALAR) * force),
-            2,
+            3,
             static_cast<float>(p.N - 3));
     width = static_cast<unsigned int>(excitationWidth);
     auto halfWidth = .5f * excitationWidth;

@@ -24,13 +24,13 @@ protected:
 
     virtual void applyExcitation(std::vector<double *> &state) = 0;
 
-    unsigned int N;
     float position{0.f}, force{0.f}, velocity{0.f};
 
-private:
+//    Resonator::ResonatorParameters *&resonatorParameters;
+
     friend class Resonator;
 
-    void setNumGridPoints(unsigned int numGridPoints);
+private:
 };
 
 

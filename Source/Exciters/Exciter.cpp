@@ -21,7 +21,3 @@ void Exciter::setVelocity(float velocityToUse) {
 void Exciter::setForce(float forceToUse) {
     force = forceToUse;
 }
-
-void Exciter::setNumGridPoints(unsigned int numGridPoints) {
-    N = numGridPoints;
-}

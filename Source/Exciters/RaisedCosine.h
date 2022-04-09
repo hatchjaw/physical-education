@@ -24,7 +24,7 @@ protected:
     void applyExcitation(std::vector<double *> &state) override;
 
 private:
-    const float WIDTH_SCALAR{.25f}, DURATION_SCALAR{8.f}, FORCE_SCALAR{.005f};
+    const float WIDTH_SCALAR{.15f}, DURATION_SCALAR{10.f}, FORCE_SCALAR{.005f};
     unsigned int width{0}, start{0}, durationSamples{1}, sampleCount{1};
     Resonator::ResonatorParameters &resonatorParameters;
 };

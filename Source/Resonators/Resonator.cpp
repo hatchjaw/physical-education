@@ -35,7 +35,6 @@ void Resonator::initialiseModel(FType sampleRate) {
     parameters.derived.k = 1.0 / sampleRate;
     parameters.derived.kSq = pow(parameters.derived.k, 2);
     computeCoefficients();
-    exciter->setNumGridPoints(parameters.derived.N);
     initialiseState();
     isInitialised = true;
 }
