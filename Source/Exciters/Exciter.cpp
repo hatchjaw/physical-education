@@ -4,7 +4,11 @@
 
 #include "Exciter.h"
 
-void Exciter::initialiseExcitation(float excitationPosition, float excitationForce, float excitationVelocity) {
+//Exciter::Exciter(Resonator::ResonatorParameters &parameters) : resonatorParameters(parameters) {}
+
+void Exciter::initialiseExcitation(float excitationPosition,
+                                   float excitationForce,
+                                   float excitationVelocity) {
     position = excitationPosition;
     force = excitationForce;
     velocity = excitationVelocity;

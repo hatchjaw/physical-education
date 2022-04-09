@@ -2,8 +2,8 @@
 // Created by Tommy Rushton on 23/03/2022.
 //
 
-#ifndef NIME_PM_UTILS_H
-#define NIME_PM_UTILS_H
+#ifndef PHYSICAL_EDUCATION_UTILS_H
+#define PHYSICAL_EDUCATION_UTILS_H
 
 #include <cmath>
 
@@ -45,6 +45,31 @@ public:
 
         return input;
     }
+
+    static float newtonRaphson() {
+        return 0.f;
+    }
+
+    static double interpolate(const double *u, int readPos, double alpha) {
+        return u[readPos - 1] * (-alpha * (alpha - 1) * (alpha - 2) / 6.0) +
+               u[readPos] * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0) +
+               u[readPos + 1] * (-alpha * (alpha + 1) * (alpha - 2) / 2.0) +
+               u[readPos + 2] * (alpha * (alpha + 1) * (alpha - 1) / 6.0);
+    }
+
+    static void extrapolate(
+            double *u,
+            int writePos,
+            double alpha,
+            double gridSpacing,
+            double excitation
+    ) {
+        auto hRecip = 1 / gridSpacing;
+        u[writePos - 1] += hRecip * excitation * (-alpha * (alpha - 1) * (alpha - 2) / 6.0);
+        u[writePos] += hRecip * excitation * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0);
+        u[writePos + 1] = hRecip * excitation * (-alpha * (alpha + 1) * (alpha - 2) / 2.0);
+        u[writePos + 2] = hRecip * excitation * (alpha * (alpha + 1) * (alpha - 1) / 6.0);
+    }
 };
 
-#endif //NIME_PM_UTILS_H
+#endif //PHYSICAL_EDUCATION_UTILS_H

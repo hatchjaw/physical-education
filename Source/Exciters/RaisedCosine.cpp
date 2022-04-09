@@ -5,6 +5,8 @@
 #include "RaisedCosine.h"
 #include "../Utils.h"
 
+RaisedCosine::RaisedCosine(Resonator::ResonatorParameters &parameters) : resonatorParameters(parameters) {}
+
 void RaisedCosine::initialiseExcitation(float excitationPosition,
                                         float excitationForce,
                                         float excitationVelocity) {
@@ -12,10 +14,11 @@ void RaisedCosine::initialiseExcitation(float excitationPosition,
 
     // Keep the width sensible relative to the total number of grid-points, and
     // respect the boundary conditions.
+    auto p = resonatorParameters.derived;
     auto excitationWidth = Utils::clamp(
-            floor((N * WIDTH_SCALAR) * force),
+            floor((p.N * WIDTH_SCALAR) * force),
             2,
-            static_cast<float>(N - 3));
+            static_cast<float>(p.N - 3));
     width = static_cast<unsigned int>(excitationWidth);
     auto halfWidth = .5f * excitationWidth;
 
@@ -25,8 +28,8 @@ void RaisedCosine::initialiseExcitation(float excitationPosition,
     // Find the nearest integer start index; also ensure the excitation can't
     // exceed the bounds of the grid, and respect the boundary conditions.
     start = static_cast<unsigned int>(std::min(
-            std::max(static_cast<int>(floor(static_cast<float>(N) * pos - halfWidth)), 2),
-            static_cast<int>(N - width)
+            std::max(static_cast<int>(floor(static_cast<float>(p.N) * pos - halfWidth)), 2),
+            static_cast<int>(p.N - width)
     ));
 
     durationSamples = static_cast<unsigned int>(
@@ -43,9 +46,10 @@ void RaisedCosine::applyExcitation(std::vector<double *> &state) {
                           (1 - cos((M_PI * sampleCount) / (durationSamples * .5)));
         auto halfWidth = .5f * static_cast<float>(width);
 
-        // Apply the excitation by adding displacement to the identified range of grid-points.
+        // Apply the excitation by adding displacement to the identified range of
+        // grid-points. Negative because that corresponds with upward displacement.
         for (unsigned int l = 0; l < width; ++l) {
-            state[1][l + start] += forceToUse * (1 - cos((M_PI * l) / halfWidth));
+            state[1][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
         }
 
         --sampleCount;
@@ -53,5 +57,5 @@ void RaisedCosine::applyExcitation(std::vector<double *> &state) {
 }
 
 void RaisedCosine::setWidth(double normalisedWidth) {
-    width = static_cast<unsigned int>(floor(N * normalisedWidth));
+    width = static_cast<unsigned int>(floor(resonatorParameters.derived.N * normalisedWidth));
 }

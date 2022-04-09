@@ -2,8 +2,8 @@
 // Created by Tommy Rushton on 23/03/2022.
 //
 
-#ifndef NIME_PM_RESONATOR_H
-#define NIME_PM_RESONATOR_H
+#ifndef PHYSICAL_EDUCATION_RESONATOR_H
+#define PHYSICAL_EDUCATION_RESONATOR_H
 
 #include <JuceHeader.h>
 #include <vector>
@@ -13,12 +13,83 @@ using FType = double;
 
 class Resonator {
 public:
+    struct ResonatorParameters {
+        struct DerivedParameters {
+            /**
+             * Timestep (s)
+             */
+            FType k{0.0}, kSq{0.0};
+            /**
+             * Grid spacing (m)
+             */
+            FType h{0.0}, hSq{0.0}, hSqSq{0.0};
+            /**
+             * Wavespeed (m/s)
+             */
+            FType c{0.0}, cSq{0.0};
+            /**
+             * Stiffness
+             */
+            FType kappa{0.0}, kappaSq{0.0};
+            /**
+             * Damping coefficients
+             */
+            FType sigma0{0.0}, sigma1{0.0};
+            /**
+             * Cross-sectional area (m^2)
+             */
+            FType A{0.0};
+            /**
+             * Area moment of inertia (m^4)
+             */
+            FType I{0.0};
+            /**
+             * Number of grid points
+             */
+            unsigned int N{0};
+            /**
+             * Combined coefficients
+             */
+            FType lambda{0.0}, mu{0.0};
+            /**
+             * Should be close to 1
+             */
+            FType lambdaSqPlus4MuSq{0.0};
+        };
+        /**
+         * Frequency-independent decay time
+         */
+        FType T60_0{0.0};
+        /**
+         * Frequency-dependent decay...
+         * TODO: needs to be calculated differently.
+         * NB. for stability, T60_1 should be greater than T60_0.
+         */
+        FType T60_1{0.0};
+        /**
+         * Density (kg/m^3)
+         */
+        FType rho{0.0};
+        /**
+         * Cross-sectional radius (m)
+         */
+        FType r{0.0};
+        /**
+         * Tension (N)
+         */
+        FType T{0.0};
+        /**
+         * Young's modulus (Pa)
+         */
+        FType E{0.0};
+        DerivedParameters derived;
+    };
+
     /**
      * Resonator constructor
      * @param stencil
-     * @param exciterToUse
      */
-    explicit Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse);
+    Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse);
 
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
@@ -71,6 +142,8 @@ public:
      */
     std::vector<FType> &getState();
 
+    ResonatorParameters &getParameters();
+
 protected:
     /**
      * Convert from a 60 dB decay time to a sigma value.
@@ -96,18 +169,13 @@ protected:
      */
     std::pair<unsigned int, unsigned int> stencilDimensions;
     /**
-     * Model parameters. Time-step, 60 dB decay time, 60 dB frequency-dependent decay time.
-     * NB. for stability, T60_1 should be greater than T60_0.
+     * Model parameters.
      */
-    FType k, T60_0, T60_1;
+    ResonatorParameters parameters;
     /**
      * Derived coefficients.
      */
     std::vector<FType> coeffs;
-    /**
-     * Number of position grid-points.
-     */
-    unsigned int N;
     /**
      * State pointers. To be treated as a circular buffer of states.
      */
@@ -132,4 +200,4 @@ private:
 };
 
 
-#endif //NIME_PM_RESONATOR_H
+#endif //PHYSICAL_EDUCATION_RESONATOR_H

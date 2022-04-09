@@ -6,9 +6,11 @@
 #define PHYSICAL_EDUCATION_EXCITER_H
 
 #include <vector>
+//#include "../Resonators/Resonator.h"
 
 class Exciter {
 public:
+//    explicit Exciter(Resonator::ResonatorParameters &parameters);
 protected:
     virtual void initialiseExcitation(
             float excitationPosition,

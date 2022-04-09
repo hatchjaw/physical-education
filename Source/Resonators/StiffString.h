@@ -2,30 +2,32 @@
 // Created by Tommy Rushton on 23/03/2022.
 //
 
-#ifndef NIME_PM_STIFFSTRING_H
-#define NIME_PM_STIFFSTRING_H
+#ifndef PHYSICAL_EDUCATION_STIFFSTRING_H
+#define PHYSICAL_EDUCATION_STIFFSTRING_H
 
 
 #include "Resonator.h"
+#include "../Exciters/RaisedCosine.h"
 
 class StiffString : public Resonator {
 public:
-    explicit StiffString(Exciter *exciterToUse);
+    explicit StiffString(Exciter *exciterToUse = nullptr);
 
-    void setWavespeed(FType newWavespeed);
+    void setDensity(FType density);
 
-    void setStiffness(FType newStiffness);
+    void setRadius(FType radius);
+
+    void setTension(FType tension);
+
+    void setYoungsModulus(FType youngsModulus);
 
 private:
+    void setDerivedParameters();
+
     void computeCoefficients() override;
 
     void computeScheme() override;
-
-    /**
-     * Model parameters. Wave propagation speed (m/s), combined string stiffness parameter.
-     */
-    FType c{700.}, kappa{9.};
 };
 
 
-#endif //NIME_PM_STIFFSTRING_H
+#endif //PHYSICAL_EDUCATION_STIFFSTRING_H

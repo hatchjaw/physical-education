@@ -14,10 +14,12 @@ bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
 }
 
 void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numOutputChannels) {
-    this->resonator->setDecayTimes(15, 10000);
+    this->resonator->setDecayTimes(13.5, 3000);
     if (auto model = dynamic_cast<StiffString *>(this->resonator)) {
-        model->setWavespeed(490.f);
-        model->setStiffness(2.f);
+        model->setDensity(7850.);
+        model->setRadius(.0005);
+        model->setTension(100.);
+        model->setYoungsModulus(2e11);
     }
     this->resonator->initialiseModel(static_cast<float>(sampleRate));
     this->resonator->setOutputPosition(.9f);

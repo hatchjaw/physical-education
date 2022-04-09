@@ -3,7 +3,6 @@
 //
 
 #include <cmath>
-#include <algorithm>
 #include <utility>
 #include "Resonator.h"
 #include "../Utils.h"
@@ -15,14 +14,17 @@ Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exc
 }
 
 void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
-    T60_0 = freqIndependent;
-    T60_1 = freqDependent;
+    parameters.T60_0 = freqIndependent;
+    parameters.derived.sigma0 = t60ToSigma(parameters.T60_0);
+    parameters.T60_1 = freqDependent;
+    parameters.derived.sigma1 = t60ToSigma(parameters.T60_1);
 }
 
 void Resonator::setOutputPosition(float outputPosition) {
-    jassert(N > 0);
+    jassert(parameters.derived.N > 0);
     outputPosition = Utils::clamp(outputPosition, 0.f, 1.f);
-    outputIndex = static_cast<int>(round(static_cast<float>(N) * outputPosition));
+    outputIndex = static_cast<int>(round(static_cast<float>(parameters.derived.N) *
+                                         outputPosition));
 }
 
 void Resonator::setExciter(Exciter *exciterToUse) {
@@ -30,9 +32,10 @@ void Resonator::setExciter(Exciter *exciterToUse) {
 }
 
 void Resonator::initialiseModel(FType sampleRate) {
-    k = 1.0 / sampleRate;
+    parameters.derived.k = 1.0 / sampleRate;
+    parameters.derived.kSq = pow(parameters.derived.k, 2);
     computeCoefficients();
-    exciter->setNumGridPoints(N);
+    exciter->setNumGridPoints(parameters.derived.N);
     initialiseState();
     isInitialised = true;
 }
@@ -54,7 +57,7 @@ FType Resonator::t60ToSigma(FType t60) {
 
 void Resonator::initialiseState() {
     // Resize and initialise uStates.
-    uStates.resize(stencilDimensions.second, std::vector<FType>(N + 1, 0.0));
+    uStates.resize(stencilDimensions.second, std::vector<FType>(parameters.derived.N + 1, 0.0));
     // Point each element in u to the address of the start of the corresponding
     // vector in uStates.
     for (unsigned long i = 0; i < stencilDimensions.second; ++i) {
@@ -65,6 +68,10 @@ void Resonator::initialiseState() {
 std::vector<FType> &Resonator::getState() {
     jassert(isInitialised);
     return uStates[1];
+}
+
+Resonator::ResonatorParameters &Resonator::getParameters() {
+    return parameters;
 }
 
 void Resonator::advanceTimestep() {
