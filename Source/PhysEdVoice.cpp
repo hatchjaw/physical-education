@@ -6,6 +6,7 @@
 #include "PhysEdSound.h"
 #include "Resonators/StiffString.h"
 #include "Utils.h"
+#include "Exciters/Bow.h"
 
 PhysEdVoice::~PhysEdVoice() = default;
 
@@ -20,6 +21,9 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         model->setRadius(.0005);
         model->setTension(100.);
         model->setYoungsModulus(2e11);
+        if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
+            exciter->setFriction(100.);
+        }
     }
     this->resonator->initialiseModel(static_cast<float>(sampleRate));
     this->resonator->setOutputPosition(.9f);
@@ -32,7 +36,7 @@ void PhysEdVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound
 }
 
 void PhysEdVoice::stopNote(float velocity, bool allowTailOff) {
-
+    this->resonator->damp();
 }
 
 void PhysEdVoice::pitchWheelMoved(int newPitchWheelValue) {

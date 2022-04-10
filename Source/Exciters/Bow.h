@@ -11,31 +11,34 @@
 
 class Bow : public Exciter {
 public:
-//    using Exciter::Exciter;
-//    Bow(Resonator::ResonatorParameters &parameters);
+    using Exciter::Exciter;
 
-    void initialiseExcitation(float excitationPosition,
-                              float excitationForce,
-                              float excitationVelocity) override;
+    void setupExcitation() override;
+
+    void startExcitation(float excitationPosition,
+                         float excitationForce,
+                         float excitationVelocity) override;
 
     void setFriction(FType friction);
 
 protected:
     void applyExcitation(std::vector<double *> &state) override;
 
+    void stopExcitation() override;
+
 private:
     const unsigned int MAX_NR_ITERATIONS{100};
-    const double TOLERANCE{1e-6};
+    const double NR_TOLERANCE{1e-6};
+    const float FORCE_SCALAR{.4f}, VELOCITY_SCALAR{.4f};
     /**
      * Friction model free parameter.
      */
-    FType a{0.0};
+    FType a{100.0};
     /**
      * Derived coefficients.
      */
     std::vector<double> coeffs;
-
-    Resonator::ResonatorParameters &resonatorParameters;
+    FType phi1{0.0}, nr1{0.0}, excitationCoefficient{0.0};
 };
 
 

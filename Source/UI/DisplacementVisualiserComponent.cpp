@@ -31,12 +31,14 @@ juce::Path DisplacementVisualiserComponent::generateStatePath() {
     std::vector<double> u(this->displacement.size());
     std::copy(this->displacement.begin(), this->displacement.end(), u.begin());
 
+    auto height = static_cast<float>(getHeight());
+
     // we have to scale up the state of the system from 'transverse
     // displacement' to 'pixels'
-    auto visualScaling = 200.f;
+    auto visualScaling = 200.f * height;
 
     // String-boundaries are in the vertical middle of the component
-    auto stringBoundaries = static_cast<float>(this->getHeight()) / 2.f;
+    auto stringBoundaries = height / 2.f;
 
     // Initialise path
     juce::Path stringPath;

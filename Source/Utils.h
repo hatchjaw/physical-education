@@ -7,6 +7,8 @@
 
 #include <cmath>
 
+using FType = double;
+
 class Utils {
 public:
     /**
@@ -67,8 +69,8 @@ public:
         auto hRecip = 1 / gridSpacing;
         u[writePos - 1] += hRecip * excitation * (-alpha * (alpha - 1) * (alpha - 2) / 6.0);
         u[writePos] += hRecip * excitation * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0);
-        u[writePos + 1] = hRecip * excitation * (-alpha * (alpha + 1) * (alpha - 2) / 2.0);
-        u[writePos + 2] = hRecip * excitation * (alpha * (alpha + 1) * (alpha - 1) / 6.0);
+        u[writePos + 1] += hRecip * excitation * (-alpha * (alpha + 1) * (alpha - 2) / 2.0);
+        u[writePos + 2] += hRecip * excitation * (alpha * (alpha + 1) * (alpha - 1) / 6.0);
     }
 };
 

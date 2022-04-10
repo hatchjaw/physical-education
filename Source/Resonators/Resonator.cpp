@@ -5,7 +5,6 @@
 #include <cmath>
 #include <utility>
 #include "Resonator.h"
-#include "../Utils.h"
 
 Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse) :
         stencilDimensions(std::move(stencil)),
@@ -35,6 +34,7 @@ void Resonator::initialiseModel(FType sampleRate) {
     parameters.derived.k = 1.0 / sampleRate;
     parameters.derived.kSq = pow(parameters.derived.k, 2);
     computeCoefficients();
+    exciter->setupExcitation();
     initialiseState();
     isInitialised = true;
 }
@@ -42,12 +42,16 @@ void Resonator::initialiseModel(FType sampleRate) {
 void Resonator::excite(float position, float force, float velocity) {
     jassert(isInitialised);
 
-    exciter->initialiseExcitation(position, force, velocity);
+    exciter->startExcitation(position, force, velocity);
+}
+
+void Resonator::damp() {
+    exciter->stopExcitation();
 }
 
 FType Resonator::getOutput() {
     jassert(isInitialised);
-    return u[1][outputIndex];
+    return getOutputScalar() * u[1][outputIndex];
 }
 
 FType Resonator::t60ToSigma(FType t60) {
@@ -69,8 +73,12 @@ std::vector<FType> &Resonator::getState() {
     return uStates[1];
 }
 
-Resonator::ResonatorParameters &Resonator::getParameters() {
+ModelParameters &Resonator::getParameters() {
     return parameters;
+}
+
+Exciter *Resonator::getExciter() {
+    return exciter;
 }
 
 void Resonator::advanceTimestep() {
@@ -85,6 +93,8 @@ void Resonator::advanceTimestep() {
 void Resonator::updateState() {
     jassert(isInitialised);
     computeScheme();
-    exciter->applyExcitation(u);
+    if (exciter->isExciting) {
+        exciter->applyExcitation(u);
+    }
     advanceTimestep();
 }

@@ -5,12 +5,10 @@
 #include "RaisedCosine.h"
 #include "../Utils.h"
 
-RaisedCosine::RaisedCosine(Resonator::ResonatorParameters &parameters) : resonatorParameters(parameters) {}
-
-void RaisedCosine::initialiseExcitation(float excitationPosition,
-                                        float excitationForce,
-                                        float excitationVelocity) {
-    Exciter::initialiseExcitation(excitationPosition, excitationForce, excitationVelocity);
+void RaisedCosine::startExcitation(float excitationPosition,
+                                   float excitationForce,
+                                   float excitationVelocity) {
+    Exciter::startExcitation(excitationPosition, excitationForce, excitationVelocity);
 
     // Keep the width sensible relative to the total number of grid-points, and
     // respect the boundary conditions.
@@ -24,7 +22,6 @@ void RaisedCosine::initialiseExcitation(float excitationPosition,
 
     // Calculate the excitation position as a proportion of N.
     auto pos = Utils::clamp(position, 0.f, 1.f);
-
     // Find the nearest integer start index; also ensure the excitation can't
     // exceed the bounds of the grid, and respect the boundary conditions.
     start = static_cast<unsigned int>(std::min(
@@ -49,13 +46,20 @@ void RaisedCosine::applyExcitation(std::vector<double *> &state) {
         // Apply the excitation by adding displacement to the identified range of
         // grid-points. Negative because that corresponds with upward displacement.
         for (unsigned int l = 0; l < width; ++l) {
-            state[1][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
+            state[2][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
         }
 
         --sampleCount;
+    } else {
+        isExciting = false;
     }
 }
 
 void RaisedCosine::setWidth(double normalisedWidth) {
     width = static_cast<unsigned int>(floor(resonatorParameters.derived.N * normalisedWidth));
+}
+
+void RaisedCosine::stopExcitation() {
+    Exciter::stopExcitation();
+//    sampleCount = 0;
 }

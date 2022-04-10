@@ -114,3 +114,7 @@ void StiffString::computeScheme() {
                   coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
     }
 }
+
+FType StiffString::getOutputScalar() {
+    return OUTPUT_SCALAR;
+}

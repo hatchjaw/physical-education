@@ -21,7 +21,11 @@ public:
 
     void setYoungsModulus(FType youngsModulus);
 
+    FType getOutputScalar() override;
+
 private:
+    const FType OUTPUT_SCALAR{1e3};
+
     void setDerivedParameters();
 
     void computeCoefficients() override;

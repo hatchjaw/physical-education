@@ -11,22 +11,23 @@
 
 class RaisedCosine : public Exciter {
 public:
-//    using Exciter::Exciter;
-    explicit RaisedCosine(Resonator::ResonatorParameters &parameters);
+    using Exciter::Exciter;
 
-    void initialiseExcitation(float excitationPosition,
-                              float excitationForce,
-                              float excitationVelocity) override;
+    void setupExcitation() override {}
+
+    void startExcitation(float excitationPosition,
+                         float excitationForce,
+                         float excitationVelocity) override;
 
     void setWidth(double normalisedWidth);
 
 protected:
     void applyExcitation(std::vector<double *> &state) override;
 
+    void stopExcitation() override;
 private:
-    const float WIDTH_SCALAR{.15f}, DURATION_SCALAR{10.f}, FORCE_SCALAR{.005f};
-    unsigned int width{0}, start{0}, durationSamples{1}, sampleCount{1};
-    Resonator::ResonatorParameters &resonatorParameters;
+    const float WIDTH_SCALAR{.15f}, DURATION_SCALAR{10.f}, FORCE_SCALAR{.000005f};
+    unsigned int width{0}, start{0}, durationSamples{0}, sampleCount{0};
 };
 
 
