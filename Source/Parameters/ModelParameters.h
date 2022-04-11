@@ -46,7 +46,7 @@ struct ModelParameters {
          */
         FType lambda{0.0}, mu{0.0};
         /**
-         * Should be close to 1
+         * Just for reference/debugging; should be close to 1
          */
         FType lambdaSqPlus4MuSq{0.0};
     };

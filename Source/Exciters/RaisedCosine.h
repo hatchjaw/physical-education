@@ -26,7 +26,7 @@ protected:
 
     void stopExcitation() override;
 private:
-    const float WIDTH_SCALAR{.15f}, DURATION_SCALAR{10.f}, FORCE_SCALAR{.000005f};
+    const float WIDTH_SCALAR{.2f}, DURATION_SCALAR{10.f}, FORCE_SCALAR{2e-6f};
     unsigned int width{0}, start{0}, durationSamples{0}, sampleCount{0};
 };
 

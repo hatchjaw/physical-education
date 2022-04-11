@@ -27,12 +27,13 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
     }
     this->resonator->initialiseModel(static_cast<float>(sampleRate));
     this->resonator->setOutputPosition(.9f);
+    this->resonator->setOutputPositions(std::pair<float, float>{.35, .9});
     this->isPrepared = true;
 }
 
 void PhysEdVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound *sound,
                             int currentPitchWheelPosition) {
-    this->resonator->excite(static_cast<float>(midiNoteNumber) / 128.f, velocity, velocity);
+    this->resonator->excite(static_cast<float>(midiNoteNumber) / 127.f, velocity, velocity);
 }
 
 void PhysEdVoice::stopNote(float velocity, bool allowTailOff) {
@@ -69,10 +70,14 @@ void PhysEdVoice::renderNextBlock(
 
     while (--numSamples >= 0) {
         this->resonator->updateState();
-        auto currentSample = Utils::clamp(this->resonator->getOutput(), -1.f, 1.f);
+//        auto currentSample = Utils::clamp(this->resonator->getOutput(), -1.f, 1.f);
+        auto currentSamples = this->resonator->getOutputStereo();
+        auto samp1 = Utils::clamp(currentSamples.first, -1.0f, 1.0f);
+        auto samp2 = Utils::clamp(currentSamples.second, -1.0f, 1.0f);
 
         for (auto i = (int) this->buffer.getNumChannels(); --i >= 0;) {
-            this->buffer.addSample((int) i, startSample, currentSample);
+            auto sample = i % 2 == 0 ? samp2 : samp1;
+            this->buffer.addSample((int) i, startSample, sample);
         }
 
         ++startSample;

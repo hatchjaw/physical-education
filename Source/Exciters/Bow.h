@@ -28,8 +28,8 @@ protected:
 
 private:
     const unsigned int MAX_NR_ITERATIONS{100};
-    const double NR_TOLERANCE{1e-6};
-    const float FORCE_SCALAR{.4f}, VELOCITY_SCALAR{.4f};
+    const double NR_TOLERANCE{1e-7};
+    const float FORCE_SCALAR{.2f}, VELOCITY_SCALAR{.2f};
     /**
      * Friction model free parameter.
      */

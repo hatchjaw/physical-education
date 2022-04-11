@@ -19,11 +19,20 @@ void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
     parameters.derived.sigma1 = t60ToSigma(parameters.T60_1);
 }
 
-void Resonator::setOutputPosition(float outputPosition) {
+void Resonator::setOutputPosition(float outputPositionToUse) {
     jassert(parameters.derived.N > 0);
-    outputPosition = Utils::clamp(outputPosition, 0.f, 1.f);
-    outputIndex = static_cast<int>(round(static_cast<float>(parameters.derived.N) *
-                                         outputPosition));
+    outputPositionToUse = Utils::clamp(outputPositionToUse, 0.f, 1.f);
+    outputPosition = outputPositionToUse * static_cast<float>(parameters.derived.N);
+}
+
+void Resonator::setOutputPositions(std::pair<float, float> outputPositionsToUse) {
+    jassert(parameters.derived.N > 0);
+
+    outputPositionsToUse.first = Utils::clamp(outputPositionsToUse.first, 0.f, 1.f);
+    outputPositionsToUse.second = Utils::clamp(outputPositionsToUse.second, 0.f, 1.f);
+    normalisedOutputPositions = outputPositionsToUse;
+    outputPositions.first = outputPositionsToUse.first * static_cast<float>(parameters.derived.N);
+    outputPositions.second = outputPositionsToUse.second * static_cast<float>(parameters.derived.N);
 }
 
 void Resonator::setExciter(Exciter *exciterToUse) {
@@ -51,7 +60,49 @@ void Resonator::damp() {
 
 FType Resonator::getOutput() {
     jassert(isInitialised);
-    return getOutputScalar() * u[1][outputIndex];
+    float readPos;
+    auto alpha = modf(outputPosition, &readPos);
+    return getOutputScalar() * Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
+}
+
+// TODO: add option of using velocity instead of displacement for output.
+std::pair<FType, FType> Resonator::getOutputStereo() {
+    jassert(isInitialised);
+
+    auto getOutput = [this](float outPos, float normalisedOutPos) -> FType {
+        // Separate the integer and fractional parts of the read position.
+        float readPos;
+        auto alpha = modf(outPos, &readPos);
+        // Adjust amplitude wrt the output position. Positions close to the
+        // centre have greater displacement than positions at the extremities.
+        // TODO: maybe get rid of this, as it probably only holds for strings.
+        auto positionAdjustment = 2 * fabs(normalisedOutPos - .5);
+
+        switch (outputMode) {
+            case DISPLACEMENT:
+                return getOutputScalar() *
+                       sqrt(positionAdjustment) *
+                       Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
+            case VELOCITY:
+                // Return the scaled displacement, interpolated around the read position.
+                return getOutputScalar() *
+                       sqrt(positionAdjustment) *
+                       (1 / (2 * parameters.derived.k)) * (
+                               // By now the timestep has been advanced, so u[1] is next
+                               // and u[2] is prev.
+                               Utils::interpolate(u[1], static_cast<int>(readPos), alpha) -
+                               // TODO: find a way to cache the previous sample for each output position.
+                               Utils::interpolate(u[2], static_cast<int>(readPos), alpha)
+                       );
+            default:
+                jassertfalse;
+        }
+    };
+
+    return std::pair<FType, FType>{
+            getOutput(outputPositions.first, normalisedOutputPositions.first),
+            getOutput(outputPositions.second, normalisedOutputPositions.second),
+    };
 }
 
 FType Resonator::t60ToSigma(FType t60) {

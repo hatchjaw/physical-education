@@ -13,6 +13,11 @@
 
 class Resonator {
 public:
+    enum OutputMode {
+        DISPLACEMENT,
+        VELOCITY,
+    };
+
     /**
      * Resonator constructor
      * @param stencil
@@ -26,9 +31,11 @@ public:
      * calculates the corresponding l-value.
      * NB. N must be set before calling this method.
      *
-     * @param outputPosition Normalised output position.
+     * @param outputPositionToUse Normalised output position.
      */
-    void setOutputPosition(float outputPosition);
+    void setOutputPosition(float outputPositionToUse);
+
+    void setOutputPositions(std::pair<float, float> outputPositionsToUse);
 
     /**
      * Set the resonator's exciter.
@@ -63,6 +70,8 @@ public:
      * @return The displacement of the output grid-point.
      */
     FType getOutput();
+
+    std::pair<FType, FType> getOutputStereo();
 
     virtual FType getOutputScalar() = 0;
 
@@ -116,6 +125,8 @@ protected:
     std::vector<FType *> u;
     std::vector<std::vector<FType>> uStates;
 
+    OutputMode outputMode{VELOCITY};
+
     bool isInitialised{false};
 private:
     /**
@@ -128,7 +139,10 @@ private:
      */
     void advanceTimestep();
 
-    int outputIndex{0};
+    float outputPosition{0.f};
+    std::pair<float, float> normalisedOutputPositions{0.f, 0.f};
+    std::pair<float, float> outputPositions{0.f, 0.f};
+//    std::pair<FType, FType> previousSamples{0., 0.};
 
     Exciter *exciter;
 };

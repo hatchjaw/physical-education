@@ -116,5 +116,10 @@ void StiffString::computeScheme() {
 }
 
 FType StiffString::getOutputScalar() {
-    return OUTPUT_SCALAR;
+    switch (outputMode) {
+        case DISPLACEMENT:
+            return .75e3;
+        case VELOCITY:
+            return 1;
+    }
 }
