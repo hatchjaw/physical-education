@@ -55,9 +55,9 @@ void Bow::applyExcitation(std::vector<double *> &state) {
             Utils::interpolate(state[1], bowPos + 2, alpha),
     };
     std::vector<double> uBPrev = {
-            Utils::interpolate(state[0], bowPos - 1, alpha),
-            Utils::interpolate(state[0], bowPos, alpha),
-            Utils::interpolate(state[0], bowPos + 1, alpha),
+            Utils::interpolate(state[2], bowPos - 1, alpha),
+            Utils::interpolate(state[2], bowPos, alpha),
+            Utils::interpolate(state[2], bowPos + 1, alpha),
     };
 
     auto b = coeffs[0] * velocity +
@@ -87,7 +87,7 @@ void Bow::applyExcitation(std::vector<double *> &state) {
     auto excitation = excitationCoefficient * force * vRel * exp(-a * pow(vRel, 2));
 
     // Apply the excitation.
-    Utils::extrapolate(state[2], bowPos, alpha, p.h, -excitation);
+    Utils::extrapolate(state[0], bowPos, alpha, p.h, -excitation);
 }
 
 void Bow::stopExcitation() {

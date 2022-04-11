@@ -27,15 +27,19 @@ public:
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
     /**
-     * Set the output position for the model. Takes a float 0 ≤ p ≤ 1 and
-     * calculates the corresponding l-value.
+     * Set the output positions for the model. Takes a vector of floats,
+     * 0 ≤ p ≤ 1, and calculates the corresponding l-values.
      * NB. N must be set before calling this method.
      *
-     * @param outputPositionToUse Normalised output position.
+     * @param outputPositionToUse Normalised output positions. These will be clamped to 0 ≤ p ≤ 1.
      */
-    void setOutputPosition(float outputPositionToUse);
+    void setOutputPositions(std::vector<float> outputPositionsToUse);
 
-    void setOutputPositions(std::pair<float, float> outputPositionsToUse);
+    /**
+     * Set the output mode; use either DISPLACEMENT or VELOCITY.
+     * @param mode
+     */
+    void setOutputMode(OutputMode mode);
 
     /**
      * Set the resonator's exciter.
@@ -65,24 +69,35 @@ public:
     virtual void updateState();
 
     /**
-     * Get the current displacement of the output grid-point.
+     * Get the current displacement of the output positions.
      *
-     * @return The displacement of the output grid-point.
+     * @return A vector containing the displacement of the output positions.
      */
-    FType getOutput();
+    std::vector<FType> getOutput(unsigned long numOutputPositions);
 
-    std::pair<FType, FType> getOutputStereo();
-
+    /**
+     * Get the scaling factor for bringing the resonator's output into a useful
+     * amplitude range.
+     * @return
+     */
     virtual FType getOutputScalar() = 0;
 
     /**
-     *
-     * @return A reference to a vector in vector of state vectors.
+     * Get a reference to the resonator's 'current' state vector.
+     * @return The current state vector.
      */
     std::vector<FType> &getState();
 
+    /**
+     * Get a reference to the resonator's parameter space.
+     * @return
+     */
     ModelParameters &getParameters();
 
+    /**
+     * Get a pointer to the exciter.
+     * @return
+     */
     Exciter *getExciter();
 
     void damp();
@@ -125,7 +140,7 @@ protected:
     std::vector<FType *> u;
     std::vector<std::vector<FType>> uStates;
 
-    OutputMode outputMode{VELOCITY};
+    OutputMode outputMode{DISPLACEMENT};
 
     bool isInitialised{false};
 private:
@@ -139,10 +154,23 @@ private:
      */
     void advanceTimestep();
 
-    float outputPosition{0.f};
-    std::pair<float, float> normalisedOutputPositions{0.f, 0.f};
-    std::pair<float, float> outputPositions{0.f, 0.f};
-//    std::pair<FType, FType> previousSamples{0., 0.};
+    /**
+     * Get the current displacement of a single output position.
+     * @return The displacement of the output position.
+     */
+    FType getOutputAtPosition(unsigned long outputPositionIndex);
+
+    /**
+     * Positions from which to take displacement for output.
+     */
+    std::vector<float> normalisedOutputPositions;
+    std::vector<float> outputPositions;
+    /**
+     * Buffers to store the most recent displacements for each output position.
+     * To be used when using velocity for output.
+     */
+    std::vector<FType *> uOut;
+    std::vector<std::vector<FType>> uOutStates;
 
     Exciter *exciter;
 };

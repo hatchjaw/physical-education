@@ -6,6 +6,8 @@
 #define PHYSICAL_EDUCATION_UTILS_H
 
 #include <cmath>
+#include <vector>
+#include <random>
 
 using FType = double;
 
@@ -48,10 +50,6 @@ public:
         return input;
     }
 
-    static float newtonRaphson() {
-        return 0.f;
-    }
-
     static double interpolate(const double *u, int readPos, double alpha) {
         return u[readPos - 1] * (-alpha * (alpha - 1) * (alpha - 2) / 6.0) +
                u[readPos] * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0) +
@@ -71,6 +69,46 @@ public:
         u[writePos] += hRecip * excitation * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0);
         u[writePos + 1] += hRecip * excitation * (-alpha * (alpha + 1) * (alpha - 2) / 2.0);
         u[writePos + 2] += hRecip * excitation * (alpha * (alpha + 1) * (alpha - 1) / 6.0);
+    }
+
+    /**
+     * Set up a vector of vectors and a vector of pointers to the first elements
+     * in each vector in the vector of vectors.
+     * @param vectorOfPointers
+     * @param vectorOfVectors
+     * @param x First dimension, number of vectors of pointers.
+     * @param y Second dimension, number of elements in the nested vectors.
+     * @param init FType Initial value for elements in the nested vectors.
+     */
+    static void setupVectorPointers(
+            std::vector<FType *> &vectorOfPointers,
+            std::vector<std::vector<FType>> &vectorOfVectors,
+            size_t x,
+            size_t y,
+            FType init = 0.0
+    ) {
+        vectorOfPointers.resize(x);
+        vectorOfVectors.resize(x, std::vector<FType>(y, init));
+        // Point each element in uOut to the address of the start of the
+        // corresponding vector in uOutStates.
+        for (unsigned long i = 0; i < x; ++i) {
+            vectorOfPointers[i] = &vectorOfVectors[i][0];
+        }
+    }
+
+    static void pointerSwap(std::vector<FType *> &vectorOfPointers) {
+        auto end = vectorOfPointers.size() - 1;
+        auto temp = vectorOfPointers[end];
+        for (unsigned long i = end; i > 0; --i) {
+            vectorOfPointers[i] = vectorOfPointers[i - 1];
+        }
+        vectorOfPointers[0] = temp;
+    }
+
+    static float randomFloat(float min, float max) {
+        static std::default_random_engine rng;
+        std::uniform_real_distribution<float> dist(min, max);
+        return dist(rng);
     }
 };
 

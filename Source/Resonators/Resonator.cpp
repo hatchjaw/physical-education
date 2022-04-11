@@ -19,20 +19,24 @@ void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
     parameters.derived.sigma1 = t60ToSigma(parameters.T60_1);
 }
 
-void Resonator::setOutputPosition(float outputPositionToUse) {
+void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
     jassert(parameters.derived.N > 0);
-    outputPositionToUse = Utils::clamp(outputPositionToUse, 0.f, 1.f);
-    outputPosition = outputPositionToUse * static_cast<float>(parameters.derived.N);
+
+    Utils::setupVectorPointers(uOut, uOutStates, 3, outputPositionsToUse.size());
+
+    outputPositions.resize(outputPositionsToUse.size());
+    normalisedOutputPositions.resize(outputPositionsToUse.size());
+
+    for (unsigned long i = 0; i < outputPositionsToUse.size(); ++i) {
+        auto position = Utils::clamp(outputPositionsToUse[i], 0.f, 1.f);
+        normalisedOutputPositions[i] = position;
+        position *= static_cast<float>(parameters.derived.N);
+        outputPositions[i] = position;
+    }
 }
 
-void Resonator::setOutputPositions(std::pair<float, float> outputPositionsToUse) {
-    jassert(parameters.derived.N > 0);
-
-    outputPositionsToUse.first = Utils::clamp(outputPositionsToUse.first, 0.f, 1.f);
-    outputPositionsToUse.second = Utils::clamp(outputPositionsToUse.second, 0.f, 1.f);
-    normalisedOutputPositions = outputPositionsToUse;
-    outputPositions.first = outputPositionsToUse.first * static_cast<float>(parameters.derived.N);
-    outputPositions.second = outputPositionsToUse.second * static_cast<float>(parameters.derived.N);
+void Resonator::setOutputMode(Resonator::OutputMode mode) {
+    outputMode = mode;
 }
 
 void Resonator::setExciter(Exciter *exciterToUse) {
@@ -58,51 +62,51 @@ void Resonator::damp() {
     exciter->stopExcitation();
 }
 
-FType Resonator::getOutput() {
+FType Resonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     jassert(isInitialised);
+    jassert(outputPositionIndex < outputPositions.size());
+
+    // Separate the integer and fractional parts of the read position.
     float readPos;
-    auto alpha = modf(outputPosition, &readPos);
-    return getOutputScalar() * Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
+    auto alpha = modf(outputPositions[outputPositionIndex], &readPos);
+    // Adjust amplitude wrt the output position. Positions close to the
+    // centre have greater displacement than positions at the extremities.
+    // TODO: maybe get rid of this, as it probably only holds for strings.
+    auto positionAdjustment = 2 * fabs(normalisedOutputPositions[outputPositionIndex] - .5);
+
+    // Get the displacement, interpolated around the read position.
+    auto displacement = Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
+
+    // Save it to the displacement buffer.
+    uOut[0][outputPositionIndex] = displacement;
+
+    switch (outputMode) {
+        case DISPLACEMENT:
+            // Just return the appropriately scaled displacement.
+            return getOutputScalar() * sqrt(positionAdjustment) * displacement;
+        case VELOCITY:
+            // Return the appropriately scaled velocity, taken as the
+            // difference between the current displacement and the displacement
+            // two samples ago.
+            return getOutputScalar() *
+                   sqrt(positionAdjustment) *
+                   (1 / (2 * parameters.derived.k)) *
+                   (displacement - uOut[2][outputPositionIndex]);
+        default:
+            jassertfalse;
+    }
 }
 
-// TODO: add option of using velocity instead of displacement for output.
-std::pair<FType, FType> Resonator::getOutputStereo() {
+std::vector<FType> Resonator::getOutput(unsigned long numOutputPositions) {
     jassert(isInitialised);
 
-    auto getOutput = [this](float outPos, float normalisedOutPos) -> FType {
-        // Separate the integer and fractional parts of the read position.
-        float readPos;
-        auto alpha = modf(outPos, &readPos);
-        // Adjust amplitude wrt the output position. Positions close to the
-        // centre have greater displacement than positions at the extremities.
-        // TODO: maybe get rid of this, as it probably only holds for strings.
-        auto positionAdjustment = 2 * fabs(normalisedOutPos - .5);
+    auto out = std::vector<FType>(numOutputPositions);
 
-        switch (outputMode) {
-            case DISPLACEMENT:
-                return getOutputScalar() *
-                       sqrt(positionAdjustment) *
-                       Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
-            case VELOCITY:
-                // Return the scaled displacement, interpolated around the read position.
-                return getOutputScalar() *
-                       sqrt(positionAdjustment) *
-                       (1 / (2 * parameters.derived.k)) * (
-                               // By now the timestep has been advanced, so u[1] is next
-                               // and u[2] is prev.
-                               Utils::interpolate(u[1], static_cast<int>(readPos), alpha) -
-                               // TODO: find a way to cache the previous sample for each output position.
-                               Utils::interpolate(u[2], static_cast<int>(readPos), alpha)
-                       );
-            default:
-                jassertfalse;
-        }
-    };
+    for (unsigned long i = 0; i < numOutputPositions; ++i) {
+        out[i] = getOutputAtPosition(i);
+    }
 
-    return std::pair<FType, FType>{
-            getOutput(outputPositions.first, normalisedOutputPositions.first),
-            getOutput(outputPositions.second, normalisedOutputPositions.second),
-    };
+    return out;
 }
 
 FType Resonator::t60ToSigma(FType t60) {
@@ -110,13 +114,7 @@ FType Resonator::t60ToSigma(FType t60) {
 }
 
 void Resonator::initialiseState() {
-    // Resize and initialise uStates.
-    uStates.resize(stencilDimensions.second, std::vector<FType>(parameters.derived.N + 1, 0.0));
-    // Point each element in u to the address of the start of the corresponding
-    // vector in uStates.
-    for (unsigned long i = 0; i < stencilDimensions.second; ++i) {
-        u[i] = &uStates[i][0];
-    }
+    Utils::setupVectorPointers(u, uStates, stencilDimensions.second, parameters.derived.N + 1);
 }
 
 std::vector<FType> &Resonator::getState() {
@@ -134,11 +132,11 @@ Exciter *Resonator::getExciter() {
 
 void Resonator::advanceTimestep() {
     jassert(isInitialised);
+
     // Swap pointers to advance the time-step.
-    auto uTemp = u[0];
-    u[0] = u[1];
-    u[1] = u[2];
-    u[2] = uTemp;
+    Utils::pointerSwap(u);
+    // Also rotate the displacement buffer.
+    Utils::pointerSwap(uOut);
 }
 
 void Resonator::updateState() {

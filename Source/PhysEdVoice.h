@@ -35,7 +35,7 @@ public:
 
     /**
      *
-     * @return A reference to a vector in the resonator's vector of state vectors.
+     * @return A reference to the resonator's current state vector.
      */
     std::vector<double> &getResonatorState();
 

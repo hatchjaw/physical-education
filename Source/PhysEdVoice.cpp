@@ -26,8 +26,8 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         }
     }
     this->resonator->initialiseModel(static_cast<float>(sampleRate));
-    this->resonator->setOutputPosition(.9f);
-    this->resonator->setOutputPositions(std::pair<float, float>{.35, .9});
+    this->resonator->setOutputPositions(std::vector<float>{.35f, .9f});
+    this->resonator->setOutputMode(Resonator::OutputMode::VELOCITY);
     this->isPrepared = true;
 }
 
@@ -61,7 +61,8 @@ void PhysEdVoice::renderNextBlock(
 
     // MIDI messages can occur at any point during a buffer,
     // so prevent discontinuities by writing to a temp buffer.
-    this->buffer.setSize(outputBuffer.getNumChannels(), numSamples, false, false, true);
+    auto numChannels = outputBuffer.getNumChannels();
+    this->buffer.setSize(numChannels, numSamples, false, false, true);
     this->buffer.clear();
 
     auto originalNumSamples = numSamples;
@@ -70,13 +71,11 @@ void PhysEdVoice::renderNextBlock(
 
     while (--numSamples >= 0) {
         this->resonator->updateState();
-//        auto currentSample = Utils::clamp(this->resonator->getOutput(), -1.f, 1.f);
-        auto currentSamples = this->resonator->getOutputStereo();
-        auto samp1 = Utils::clamp(currentSamples.first, -1.0f, 1.0f);
-        auto samp2 = Utils::clamp(currentSamples.second, -1.0f, 1.0f);
+
+        auto samples = this->resonator->getOutput(numChannels);
 
         for (auto i = (int) this->buffer.getNumChannels(); --i >= 0;) {
-            auto sample = i % 2 == 0 ? samp2 : samp1;
+            auto sample = Utils::clamp(samples[i], -1.0f, 1.0f);
             this->buffer.addSample((int) i, startSample, sample);
         }
 

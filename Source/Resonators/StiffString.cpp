@@ -92,26 +92,26 @@ void StiffString::computeCoefficients() {
 void StiffString::computeScheme() {
     // Handle boundary conditions (simply-supported)
     unsigned int l = 1;
-    u[2][l] = coeffs[1] * u[1][l] +
-              coeffs[2] * u[0][l] +
+    u[0][l] = coeffs[1] * u[1][l] +
+              coeffs[2] * u[2][l] +
               coeffs[3] * u[1][l + 2] +
               coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
-              coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
+              coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
 
     l = parameters.derived.N - 1;
-    u[2][l] = coeffs[1] * u[1][l] +
-              coeffs[2] * u[0][l] +
+    u[0][l] = coeffs[1] * u[1][l] +
+              coeffs[2] * u[2][l] +
               coeffs[3] * u[1][l - 2] +
               coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
-              coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
+              coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
 
     // Update all the non-boundary positions.
     for (l = 2; l < parameters.derived.N - 1; ++l) {
-        u[2][l] = coeffs[0] * u[1][l] +
-                  coeffs[2] * u[0][l] +
+        u[0][l] = coeffs[0] * u[1][l] +
+                  coeffs[2] * u[2][l] +
                   coeffs[3] * (u[1][l + 2] + u[1][l - 2]) +
                   coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
-                  coeffs[5] * (u[0][l + 1] + u[0][l - 1]);
+                  coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
     }
 }
 

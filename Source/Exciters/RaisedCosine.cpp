@@ -46,7 +46,7 @@ void RaisedCosine::applyExcitation(std::vector<double *> &state) {
         // Apply the excitation by adding displacement to the identified range of
         // grid-points. Negative because that corresponds with upward displacement.
         for (unsigned int l = 0; l < width; ++l) {
-            state[2][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
+            state[0][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
         }
 
         --sampleCount;
