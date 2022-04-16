@@ -4,7 +4,7 @@
 
 #include "DisplacementVisualiserComponent.h"
 
-DisplacementVisualiserComponent::DisplacementVisualiserComponent(std::vector<double> &modelState) :
+DisplacementVisualiserComponent::DisplacementVisualiserComponent(std::vector<FType> &modelState) :
         displacement(modelState) {
     this->startTimerHz(15);
 }
@@ -28,7 +28,7 @@ juce::Path DisplacementVisualiserComponent::generateStatePath() {
     // Make a copy of the displacement vector for this iteration, otherwise the
     // values will probably be overwritten while the path is being constructed
     // and visual discontinuities will result.
-    std::vector<double> u(this->displacement.size());
+    std::vector<FType> u(this->displacement.size());
     std::copy(this->displacement.begin(), this->displacement.end(), u.begin());
 
     auto height = static_cast<float>(getHeight());

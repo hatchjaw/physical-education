@@ -201,15 +201,6 @@ PhysicalEducationAudioProcessor::createParams() {
     return {params.begin(), params.end()};
 }
 
-//double *&PhysicalEducationAudioProcessor::getModelState() noexcept {
-//    // Get first (only?) voice, then get the pointer to its state.
-//    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
-//        if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
-//            return voice->getResonatorState();
-//        }
-//    }
-//}
-
 std::vector<double> &PhysicalEducationAudioProcessor::getModelState() noexcept {
     // Get first (only?) voice, then get the pointer to its state.
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {

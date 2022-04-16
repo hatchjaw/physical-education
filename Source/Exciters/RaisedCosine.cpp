@@ -3,7 +3,6 @@
 //
 
 #include "RaisedCosine.h"
-#include "../Utils.h"
 
 void RaisedCosine::startExcitation(float excitationPosition,
                                    float excitationForce,
@@ -35,7 +34,7 @@ void RaisedCosine::startExcitation(float excitationPosition,
     sampleCount = durationSamples;
 }
 
-void RaisedCosine::applyExcitation(std::vector<double *> &state) {
+void RaisedCosine::applyExcitation(std::vector<FType *> &state) {
     if (sampleCount > 0) {
         // No need to repeatedly calculate force/2 in the loop, so do it here.
         // Also use a raised cosine to distribute the excitation over time.
@@ -45,6 +44,7 @@ void RaisedCosine::applyExcitation(std::vector<double *> &state) {
 
         // Apply the excitation by adding displacement to the identified range of
         // grid-points. Negative because that corresponds with upward displacement.
+        // TODO: you sure about that?
         for (unsigned int l = 0; l < width; ++l) {
             state[0][l + start] -= forceToUse * (1 - cos((M_PI * l) / halfWidth));
         }

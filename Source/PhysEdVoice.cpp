@@ -93,6 +93,6 @@ void PhysEdVoice::setResonator(Resonator *resonatorToUse) {
 }
 
 
-std::vector<double> &PhysEdVoice::getResonatorState() {
+std::vector<FType> &PhysEdVoice::getResonatorState() {
     return this->resonator->getState();
 }

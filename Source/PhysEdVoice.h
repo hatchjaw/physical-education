@@ -37,7 +37,7 @@ public:
      *
      * @return A reference to the resonator's current state vector.
      */
-    std::vector<double> &getResonatorState();
+    std::vector<FType> &getResonatorState();
 
 private:
     bool isPrepared;

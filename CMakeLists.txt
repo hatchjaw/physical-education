@@ -76,6 +76,7 @@ target_sources(PhysicalEducation
         Source/PhysEdVoice.cpp
         Source/Exciters/Exciter.cpp
         Source/Exciters/RaisedCosine.cpp
+        Source/Exciters/Pluck.cpp
         Source/Exciters/Bow.cpp
         Source/Resonators/Resonator.cpp
         Source/Resonators/StiffString.cpp

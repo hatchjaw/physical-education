@@ -28,7 +28,7 @@ protected:
 
     void setVelocity(float);
 
-    virtual void applyExcitation(std::vector<double *> &state) = 0;
+    virtual void applyExcitation(std::vector<FType *> &state) = 0;
 
     virtual void stopExcitation();
 

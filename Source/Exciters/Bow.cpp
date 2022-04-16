@@ -36,7 +36,7 @@ void Bow::startExcitation(float excitationPosition,
                              excitationVelocity * VELOCITY_SCALAR);
 }
 
-void Bow::applyExcitation(std::vector<double *> &state) {
+void Bow::applyExcitation(std::vector<FType *> &state) {
     auto p = resonatorParameters.derived;
 
     // Restrict bow position so interpolation doesn't break.
@@ -47,14 +47,14 @@ void Bow::applyExcitation(std::vector<double *> &state) {
     auto alpha = modf(bowIndex, &bowIndex);
     auto bowPos = static_cast<int>(bowIndex);
 
-    std::vector<double> uB = {
+    std::vector<FType> uB = {
             Utils::interpolate(state[1], bowPos - 2, alpha),
             Utils::interpolate(state[1], bowPos - 1, alpha),
             Utils::interpolate(state[1], bowPos, alpha),
             Utils::interpolate(state[1], bowPos + 1, alpha),
             Utils::interpolate(state[1], bowPos + 2, alpha),
     };
-    std::vector<double> uBPrev = {
+    std::vector<FType> uBPrev = {
             Utils::interpolate(state[2], bowPos - 1, alpha),
             Utils::interpolate(state[2], bowPos, alpha),
             Utils::interpolate(state[2], bowPos + 1, alpha),

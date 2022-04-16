@@ -50,7 +50,7 @@ public:
         return input;
     }
 
-    static double interpolate(const double *u, int readPos, double alpha) {
+    static FType interpolate(const FType *u, int readPos, FType alpha) {
         return u[readPos - 1] * (-alpha * (alpha - 1) * (alpha - 2) / 6.0) +
                u[readPos] * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0) +
                u[readPos + 1] * (-alpha * (alpha + 1) * (alpha - 2) / 2.0) +
@@ -58,11 +58,11 @@ public:
     }
 
     static void extrapolate(
-            double *u,
+            FType *u,
             int writePos,
-            double alpha,
-            double gridSpacing,
-            double excitation
+            FType alpha,
+            FType gridSpacing,
+            FType excitation
     ) {
         auto hRecip = 1 / gridSpacing;
         u[writePos - 1] += hRecip * excitation * (-alpha * (alpha - 1) * (alpha - 2) / 6.0);
@@ -72,8 +72,8 @@ public:
     }
 
     /**
-     * Set up a vector of vectors and a vector of pointers to the first elements
-     * in each vector in the vector of vectors.
+     * Set up a vector of vectors and a vector of pointers to the first element
+     * in each vector in the vector of vectors. Try saying that quickly.
      * @param vectorOfPointers
      * @param vectorOfVectors
      * @param x First dimension, number of vectors of pointers.
@@ -89,8 +89,8 @@ public:
     ) {
         vectorOfPointers.resize(x);
         vectorOfVectors.resize(x, std::vector<FType>(y, init));
-        // Point each element in uOut to the address of the start of the
-        // corresponding vector in uOutStates.
+        // Point each element in the vector of pointers to the address of the
+        // start of the corresponding vector in the vector of vectors.
         for (unsigned long i = 0; i < x; ++i) {
             vectorOfPointers[i] = &vectorOfVectors[i][0];
         }

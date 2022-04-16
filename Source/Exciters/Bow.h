@@ -22,7 +22,7 @@ public:
     void setFriction(FType friction);
 
 protected:
-    void applyExcitation(std::vector<double *> &state) override;
+    void applyExcitation(std::vector<FType *> &state) override;
 
     void stopExcitation() override;
 
@@ -37,7 +37,7 @@ private:
     /**
      * Derived coefficients.
      */
-    std::vector<double> coeffs;
+    std::vector<FType> coeffs;
     FType phi1{0.0}, nr1{0.0}, excitationCoefficient{0.0};
 };
 

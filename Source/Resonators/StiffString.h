@@ -7,7 +7,6 @@
 
 
 #include "Resonator.h"
-#include "../Exciters/RaisedCosine.h"
 
 class StiffString : public Resonator {
 public:

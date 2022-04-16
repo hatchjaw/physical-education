@@ -22,7 +22,7 @@ public:
     void setWidth(double normalisedWidth);
 
 protected:
-    void applyExcitation(std::vector<double *> &state) override;
+    void applyExcitation(std::vector<FType *> &state) override;
 
     void stopExcitation() override;
 private:
