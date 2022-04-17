@@ -40,10 +40,10 @@ void Bow::applyExcitation(std::vector<FType *> &state) {
     auto p = resonatorParameters.derived;
 
     // Restrict bow position so interpolation doesn't break.
-    // The model uses bow position ± 2, and interpolation uses l ± 2 also, so
-    // keep bow position in range 4 ≤ bp ≤ N-3
+    // The model uses bow position ± 2, and interpolation/extrapolation use
+    // l-1 ≤ l ≤ l+2, so keep bow position in range 4 ≤ bp ≤ N-4
     auto floatN = static_cast<float>(p.N);
-    auto bowIndex = Utils::clamp(floatN * position, 4, floatN - 3);
+    auto bowIndex = Utils::clamp(floatN * position, 4, floatN - 4);
     auto alpha = modf(bowIndex, &bowIndex);
     auto bowPos = static_cast<int>(bowIndex);
 

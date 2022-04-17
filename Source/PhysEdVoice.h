@@ -39,6 +39,8 @@ public:
      */
     std::vector<FType> &getResonatorState();
 
+    Resonator *getResonator();
+
 private:
     bool isPrepared;
     Resonator *resonator;

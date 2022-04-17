@@ -149,21 +149,24 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
+    auto outPos1 = this->apvts.getRawParameterValue("OUT_POS_1")->load();
+    auto outPos2 = this->apvts.getRawParameterValue("OUT_POS_2")->load();
+    auto outputMode = (int) apvts.getRawParameterValue("OUTPUT_MODE")->load();
+    auto friction = this->apvts.getRawParameterValue("FRICTION")->load();
+
     // Update parameters
-//    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
-////        if (auto voice = dynamic_cast<peVoice *>(peSynth.getVoice(i))) {
-////            voice->setExcitationMode(excitationMode);
-////            voice->enableExcitationEnvelope(excitationEnvelopeOn);
-////            voice->setExcitationEnvelope(excitationAdsrParams);
-////            voice->updateSympatheticResonators(sympathetic1Freq,
-////                                               sympathetic1Amount,
-////                                               sympathetic2Freq,
-////                                               sympathetic2Amount);
-////            voice->updateStretchFactor(stretchFactor);
-////            voice->updatePrimaryInharmonicity(inharmonicity1Gain, inharmonicity1Order);
-////            voice->updateMutePrimary(sympatheticOnly);
-////        }
-//    }
+    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
+            auto resonator = voice->getResonator();
+
+            resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
+            resonator->setOutputMode(static_cast<Resonator::OutputMode>(outputMode));
+
+            if (auto bow = dynamic_cast<Bow *>(resonator->getExciter())) {
+                bow->setFriction(friction);
+            }
+        }
+    }
 
     physEdSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
@@ -194,13 +197,6 @@ void PhysicalEducationAudioProcessor::setStateInformation(const void *data, int 
     // whose contents will have been created by the getStateInformation() call.
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout
-PhysicalEducationAudioProcessor::createParams() {
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    return {params.begin(), params.end()};
-}
-
 std::vector<double> &PhysicalEducationAudioProcessor::getModelState() noexcept {
     // Get first (only?) voice, then get the pointer to its state.
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
@@ -208,6 +204,41 @@ std::vector<double> &PhysicalEducationAudioProcessor::getModelState() noexcept {
             return voice->getResonatorState();
         }
     }
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+PhysicalEducationAudioProcessor::createParams() {
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            "OUT_POS_1",
+            "Output Position 1",
+            juce::NormalisableRange<float>(0.f, 1.f, .01f),
+            .35f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            "OUT_POS_2",
+            "Output Position 2",
+            juce::NormalisableRange<float>(0.f, 1.f, .01f),
+            .9f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+            "OUTPUT_MODE",
+            "Output Mode",
+            juce::StringArray{"Displacement", "Velocity"},
+            1
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            "FRICTION",
+            "Bow Friction",
+            juce::NormalisableRange<float>(0.f, 1000.f, 1.f),
+            100.f
+    ));
+
+    return {params.begin(), params.end()};
 }
 
 //==============================================================================

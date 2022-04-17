@@ -53,7 +53,7 @@ juce_add_plugin(PhysicalEducation
         PLUGIN_MANUFACTURER_CODE TarQ     # A four-character manufacturer id with at least one upper-case character
         PLUGIN_CODE Tr13                  # A unique four-character plugin id with exactly one upper-case character
         # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
-        FORMATS AU # VST3 Standalone        # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+        FORMATS AU VST3 Standalone # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
         PRODUCT_NAME "PhysicalEducation") # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated
@@ -79,7 +79,10 @@ target_sources(PhysicalEducation
         Source/Exciters/Bow.cpp
         Source/Resonators/Resonator.cpp
         Source/Resonators/StiffString.cpp
-        Source/UI/DisplacementVisualiserComponent.cpp)
+        Source/UI/DisplacementVisualiserComponent.cpp
+        Source/UI/OutputPositionsComponent.cpp
+        Source/UI/OutputModeComponent.cpp
+        Source/UI/FrictionSliderComponent.cpp)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -120,8 +123,13 @@ target_link_libraries(PhysicalEducation
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
-# Sign the AU plugin to allow debugging without elevated privileges
+# Sign targets to allow debugging without elevated privileges
 add_custom_command(TARGET PhysicalEducation
         POST_BUILD
         COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
         ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/Debug/AU/PhysicalEducation.component)
+
+add_custom_command(TARGET PhysicalEducation
+        POST_BUILD
+        COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
+        ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/Debug/Standalone/PhysicalEducation.app)

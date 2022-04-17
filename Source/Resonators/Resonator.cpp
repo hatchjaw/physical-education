@@ -22,11 +22,14 @@ void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
 void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
     jassert(parameters.derived.N > 0);
 
-    Utils::setupVectorPointers(uOut, uOutStates, 3, outputPositionsToUse.size());
+    if (outputPositionsToUse.size() != outputPositions.size()) {
+        Utils::setupVectorPointers(uOut, uOutStates, 3, outputPositionsToUse.size());
 
-    outputPositions.resize(outputPositionsToUse.size());
-    normalisedOutputPositions.resize(outputPositionsToUse.size());
+        outputPositions.resize(outputPositionsToUse.size());
+        normalisedOutputPositions.resize(outputPositionsToUse.size());
+    }
 
+    // TODO: prevent discontinuities when output positions change.
     for (unsigned long i = 0; i < outputPositionsToUse.size(); ++i) {
         auto position = Utils::clamp(outputPositionsToUse[i], 0.f, 1.f);
         normalisedOutputPositions[i] = position;

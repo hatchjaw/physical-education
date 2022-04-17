@@ -8,10 +8,12 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "UI/DisplacementVisualiserComponent.h"
+#include "UI/OutputModeComponent.h"
+#include "UI/OutputPositionsComponent.h"
 
 class PhysicalEducationAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
-    PhysicalEducationAudioProcessorEditor(PhysicalEducationAudioProcessor &);
+    explicit PhysicalEducationAudioProcessorEditor(PhysicalEducationAudioProcessor &);
 
     ~PhysicalEducationAudioProcessorEditor() override;
 
@@ -24,7 +26,11 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PhysicalEducationAudioProcessor &audioProcessor;
+
+    // UI components.
     DisplacementVisualiserComponent displacementVisualiserComponent;
+    OutputModeComponent outputModeComponent;
+    OutputPositionsComponent outputPositionsComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhysicalEducationAudioProcessorEditor)
 };

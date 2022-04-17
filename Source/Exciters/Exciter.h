@@ -39,7 +39,6 @@ protected:
     ModelParameters &resonatorParameters;
 
     friend class Resonator;
-private:
 };
 
 
