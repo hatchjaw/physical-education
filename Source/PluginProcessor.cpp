@@ -7,6 +7,7 @@
 */
 
 #include "PluginProcessor.h"
+#include "Constants.h"
 #include "PhysEdSound.h"
 #include "PhysEdVoice.h"
 #include "Resonators/StiffString.h"
@@ -33,7 +34,6 @@ PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
         // Create a voice.
         auto voice = new PhysEdVoice();
         auto resonator = new StiffString();
-//        auto exciter = new RaisedCosine(resonator->getParameters());
         auto exciter = new Bow(resonator->getParameters());
         resonator->setExciter(exciter);
         voice->setResonator(resonator);
@@ -149,10 +149,15 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    auto outPos1 = this->apvts.getRawParameterValue("OUT_POS_1")->load();
-    auto outPos2 = this->apvts.getRawParameterValue("OUT_POS_2")->load();
-    auto outputMode = (int) apvts.getRawParameterValue("OUTPUT_MODE")->load();
-    auto friction = this->apvts.getRawParameterValue("FRICTION")->load();
+    auto outPos1 = this->apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_1)->load();
+    auto outPos2 = this->apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_2)->load();
+    auto outputMode = static_cast<Resonator::OutputMode>(
+            apvts.getRawParameterValue(Constants::ParameterIDs::OUTPUT_MODE)->load()
+    );
+    auto excitationType = Constants::EXCITATION_TYPES[static_cast<int>(
+            apvts.getRawParameterValue(Constants::ParameterIDs::EXCITATION_TYPE)->load()
+    )];
+    auto friction = this->apvts.getRawParameterValue(Constants::ParameterIDs::FRICTION)->load();
 
     // Update parameters
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
@@ -160,7 +165,16 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
             auto resonator = voice->getResonator();
 
             resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
-            resonator->setOutputMode(static_cast<Resonator::OutputMode>(outputMode));
+            resonator->setOutputMode(outputMode);
+
+            if (excitationType != currentExciter) {
+                currentExciter = excitationType;
+                if (excitationType == "Bow") {
+                    resonator->setExciter(new Bow(resonator->getParameters()));
+                } else if (excitationType == "Raised Cosine") {
+                    resonator->setExciter(new RaisedCosine(resonator->getParameters()));
+                }
+            }
 
             if (auto bow = dynamic_cast<Bow *>(resonator->getExciter())) {
                 bow->setFriction(friction);
@@ -210,29 +224,36 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 PhysicalEducationAudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(
+            Constants::ParameterIDs::EXCITATION_TYPE,
+            "Exciter",
+            Constants::EXCITATION_TYPES,
+            1
+    ));
+
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            "OUT_POS_1",
+            Constants::ParameterIDs::OUT_POS_1,
             "Output Position 1",
             juce::NormalisableRange<float>(0.f, 1.f, .01f),
             .35f
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            "OUT_POS_2",
+            Constants::ParameterIDs::OUT_POS_2,
             "Output Position 2",
             juce::NormalisableRange<float>(0.f, 1.f, .01f),
             .9f
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterChoice>(
-            "OUTPUT_MODE",
+            Constants::ParameterIDs::OUTPUT_MODE,
             "Output Mode",
             juce::StringArray{"Displacement", "Velocity"},
             1
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            "FRICTION",
+            Constants::ParameterIDs::FRICTION,
             "Bow Friction",
             juce::NormalisableRange<float>(0.f, 1000.f, 1.f),
             100.f

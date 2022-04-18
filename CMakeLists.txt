@@ -71,6 +71,7 @@ juce_generate_juce_header(PhysicalEducation)
 
 target_sources(PhysicalEducation
         PRIVATE
+        Source/Constants.cpp
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp
         Source/PhysEdVoice.cpp
@@ -80,6 +81,7 @@ target_sources(PhysicalEducation
         Source/Resonators/Resonator.cpp
         Source/Resonators/StiffString.cpp
         Source/UI/DisplacementVisualiserComponent.cpp
+        Source/UI/ExcitationTypeComponent.cpp
         Source/UI/OutputPositionsComponent.cpp
         Source/UI/OutputModeComponent.cpp
         Source/UI/FrictionSliderComponent.cpp)

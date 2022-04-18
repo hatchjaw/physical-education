@@ -10,6 +10,7 @@
 #include "UI/DisplacementVisualiserComponent.h"
 #include "UI/OutputModeComponent.h"
 #include "UI/OutputPositionsComponent.h"
+#include "UI/ExcitationTypeComponent.h"
 
 class PhysicalEducationAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -31,6 +32,7 @@ private:
     DisplacementVisualiserComponent displacementVisualiserComponent;
     OutputModeComponent outputModeComponent;
     OutputPositionsComponent outputPositionsComponent;
+    ExcitationTypeComponent excitationTypeComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhysicalEducationAudioProcessorEditor)
 };

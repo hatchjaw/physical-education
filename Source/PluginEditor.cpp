@@ -3,15 +3,17 @@
 //
 
 #include "PluginEditor.h"
-#include "Layout.h"
+#include "Constants.h"
 
 PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
         PhysicalEducationAudioProcessor &p
 ) : AudioProcessorEditor(&p),
     audioProcessor(p),
     displacementVisualiserComponent(audioProcessor.getModelState()),
-    outputModeComponent(audioProcessor.apvts, "OUTPUT_MODE"),
-    outputPositionsComponent(audioProcessor.apvts, "OUT_POS_1", "OUT_POS_2") {
+    outputModeComponent(audioProcessor.apvts, Constants::ParameterIDs::OUTPUT_MODE),
+    outputPositionsComponent(audioProcessor.apvts, Constants::ParameterIDs::OUT_POS_1,
+                             Constants::ParameterIDs::OUT_POS_2),
+    excitationTypeComponent(audioProcessor.apvts, Constants::ParameterIDs::EXCITATION_TYPE) {
 
     setSize(800, 600);
 
@@ -19,6 +21,7 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
     addAndMakeVisible(outputPositionsComponent);
     // Got to add this after output position component else it can't be clicked.
     addAndMakeVisible(outputModeComponent);
+    addAndMakeVisible(excitationTypeComponent);
 }
 
 PhysicalEducationAudioProcessorEditor::~PhysicalEducationAudioProcessorEditor() {
@@ -38,16 +41,18 @@ void PhysicalEducationAudioProcessorEditor::resized() {
     displacementVisualiserComponent.setBounds(area);
 
     outputModeComponent.setBounds(
-            right - Layout::OUTPUT_MODE_WIDTH,
-            bottom - Layout::OUTPUT_POSITIONS_HEIGHT,
-            Layout::OUTPUT_MODE_WIDTH,
-            static_cast<int>(.5 * Layout::OUTPUT_POSITIONS_HEIGHT)
+            right - Constants::Layout::OUTPUT_MODE_WIDTH,
+            bottom - Constants::Layout::OUTPUT_POSITIONS_HEIGHT,
+            Constants::Layout::OUTPUT_MODE_WIDTH,
+            static_cast<int>(.5 * Constants::Layout::OUTPUT_POSITIONS_HEIGHT)
     );
 
     outputPositionsComponent.setBounds(
             0,
-            bottom - Layout::OUTPUT_POSITIONS_HEIGHT,
+            bottom - Constants::Layout::OUTPUT_POSITIONS_HEIGHT,
             width,
-            Layout::OUTPUT_POSITIONS_HEIGHT
+            Constants::Layout::OUTPUT_POSITIONS_HEIGHT
     );
+
+    excitationTypeComponent.setBounds(0, 0, Constants::Layout::EXCITATION_TYPE_WIDTH, 30);
 }

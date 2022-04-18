@@ -78,6 +78,11 @@ public:
 
 private:
     juce::Synthesiser physEdSynth;
+    /**
+     * TODO: find a better way of checking the current exciter. Compare class
+     *  names or something.
+     */
+    juce::String currentExciter;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //==============================================================================

@@ -5,16 +5,16 @@
 #include "OutputModeComponent.h"
 
 OutputModeComponent::OutputModeComponent(AudioProcessorValueTreeState &apvts,
-                                         const String &outputModeID) {
+                                         const String &outputModeParamID) {
     auto choices = dynamic_cast<juce::AudioParameterChoice *>(
-            apvts.getParameter(outputModeID)
+            apvts.getParameter(outputModeParamID)
     )->choices;
     outputModeSelector.addItemList(choices, 1);
     addAndMakeVisible(outputModeSelector);
 
     outputModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
             apvts,
-            outputModeID,
+            outputModeParamID,
             outputModeSelector
     );
 

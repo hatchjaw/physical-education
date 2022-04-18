@@ -43,7 +43,8 @@ void Resonator::setOutputMode(Resonator::OutputMode mode) {
 }
 
 void Resonator::setExciter(Exciter *exciterToUse) {
-    this->exciter = exciterToUse;
+    exciter = exciterToUse;
+    exciter->setupExcitation();
 }
 
 void Resonator::initialiseModel(FType sampleRate) {
