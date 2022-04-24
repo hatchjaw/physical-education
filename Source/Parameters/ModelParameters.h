@@ -49,6 +49,17 @@ struct ModelParameters {
          * Just for reference/debugging; should be close to 1
          */
         FType lambdaSqPlus4MuSq{0.0};
+        /**
+         * 1 + sigma0*k
+         * Useful for setting coefficients, e.g. for damping/collisions.
+         */
+        FType schemeDivisor{1.0};
+        /**
+         * Scheme coefficients without the divisor. Useful for collisions and
+         * perhaps other situations where the divisor may differ from what it is
+         * for the resonator.
+         */
+        std::vector<FType> rawCoeffs;
     };
     /**
      * Frequency-independent decay time

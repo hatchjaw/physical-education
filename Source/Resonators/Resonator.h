@@ -10,6 +10,7 @@
 #include "../Utils.h"
 #include "../Parameters/ModelParameters.h"
 #include "../Exciters/Exciter.h"
+#include "../Dampers/SpringDamper.h"
 
 class Resonator {
 public:
@@ -104,11 +105,13 @@ public:
 
 protected:
     /**
-     * Convert from a 60 dB decay time to a sigma value.
+     * Convert from a 60 dB decay time to a frequency independent decay.
      * @param t60 decay time
-     * @return sigma
+     * @return sigma0
      */
-    static FType t60ToSigma(FType t60);
+    static FType t60ToSigma0(FType t60);
+
+    FType t60ToSigma1(FType t60_0, FType t60_1, FType omega);
 
     /**
      * Compute the model coefficients.
@@ -173,6 +176,8 @@ private:
     std::vector<std::vector<FType>> uOutStates;
 
     Exciter *exciter;
+
+    SpringDamper damper;
 };
 
 

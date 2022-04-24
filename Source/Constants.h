@@ -7,6 +7,11 @@
 
 #include <JuceHeader.h>
 
+/**
+ * Would like these to be compile-time constants (via static constexpr), but
+ * that's not possible for juce::String, and std::string_view doesn't appear to
+ * work either.
+ */
 struct Constants {
     struct Layout {
         static const int OUTPUT_MODE_WIDTH;

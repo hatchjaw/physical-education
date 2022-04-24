@@ -83,9 +83,12 @@ void StiffString::computeCoefficients() {
             -nu,
     };
 
+    p->rawCoeffs = coeffs;
+    p->schemeDivisor = 1 + (p->sigma0 * p->k);
+
     // Scale all coefficients by the divisor to the FDS
     for (auto &coeff: coeffs) {
-        coeff /= 1 + (p->sigma0 * p->k);
+        coeff /= p->schemeDivisor;
     }
 }
 

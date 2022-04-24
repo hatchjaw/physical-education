@@ -25,7 +25,7 @@ void Bow::setupExcitation() {
 
     phi1 = sqrt(2 * a) * exp(.5);
     nr1 = (2 / p.k) + (2 * p.sigma0);
-    excitationCoefficient = (p.kSq * phi1) / (resonatorParameters.rho * p.A * (1 + p.sigma0 * p.k));
+    excitationCoefficient = (p.kSq * phi1) / (resonatorParameters.rho * p.A * p.schemeDivisor);
 }
 
 void Bow::startExcitation(float excitationPosition,

@@ -212,7 +212,8 @@ void PhysicalEducationAudioProcessor::setStateInformation(const void *data, int 
 }
 
 std::vector<double> &PhysicalEducationAudioProcessor::getModelState() noexcept {
-    // Get first (only?) voice, then get the pointer to its state.
+    // Get first (only?) voice, then get the pointer to the state of its
+    // resonator.
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
         if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
             return voice->getResonatorState();

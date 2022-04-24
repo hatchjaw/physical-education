@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Utils.h"
 
 #define NUM_VOICES 1
 
