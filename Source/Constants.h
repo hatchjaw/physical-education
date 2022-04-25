@@ -17,6 +17,8 @@ struct Constants {
         static const int OUTPUT_MODE_WIDTH;
         static const int OUTPUT_POSITIONS_HEIGHT;
         static const int EXCITATION_TYPE_WIDTH;
+        static const int EXCITATION_TYPE_HEIGHT;
+        static const int COLLISION_PARAMS_HEIGHT;
     };
 
     struct ParameterIDs {
@@ -25,6 +27,10 @@ struct Constants {
         static const juce::StringRef OUT_POS_1;
         static const juce::StringRef OUT_POS_2;
         static const juce::StringRef FRICTION;
+        static const juce::StringRef COLLISION_POS;
+        static const juce::StringRef COLLISION_STIFFNESS;
+        static const juce::StringRef COLLISION_OMEGA1;
+        static const juce::StringRef COLLISION_DAMPING;
     };
 
     static const juce::StringArray EXCITATION_TYPES;

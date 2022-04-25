@@ -149,15 +149,19 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    auto outPos1 = this->apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_1)->load();
-    auto outPos2 = this->apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_2)->load();
+    auto outPos1 = apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_1)->load();
+    auto outPos2 = apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_2)->load();
     auto outputMode = static_cast<Resonator::OutputMode>(
             apvts.getRawParameterValue(Constants::ParameterIDs::OUTPUT_MODE)->load()
     );
     auto excitationType = Constants::EXCITATION_TYPES[static_cast<int>(
             apvts.getRawParameterValue(Constants::ParameterIDs::EXCITATION_TYPE)->load()
     )];
-    auto friction = this->apvts.getRawParameterValue(Constants::ParameterIDs::FRICTION)->load();
+    auto friction = apvts.getRawParameterValue(Constants::ParameterIDs::FRICTION)->load();
+    auto collisionPos = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_POS)->load();
+    auto collisionStiffness = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_STIFFNESS)->load();
+    auto collisionOmega1 = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_OMEGA1)->load();
+    auto collisionDamping = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_DAMPING)->load();
 
     // Update parameters
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
@@ -166,6 +170,7 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
 
             resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
             resonator->setOutputMode(outputMode);
+            resonator->setCollisionParameters(collisionPos, collisionStiffness, collisionOmega1, collisionDamping);
 
             if (excitationType != currentExciter) {
                 currentExciter = excitationType;
@@ -258,6 +263,34 @@ PhysicalEducationAudioProcessor::createParams() {
             "Bow Friction",
             juce::NormalisableRange<float>(0.f, 1000.f, 1.f),
             100.f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            Constants::ParameterIDs::COLLISION_POS,
+            "Collision Position",
+            juce::NormalisableRange<float>(0.f, 1.f, .001f),
+            0.f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            Constants::ParameterIDs::COLLISION_STIFFNESS,
+            "Collision Stiffness",
+            juce::NormalisableRange<float>(0.f, 250.f / (2 * M_PI), .1f),
+            0.f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            Constants::ParameterIDs::COLLISION_OMEGA1,
+            "Collision Omega1",
+            juce::NormalisableRange<float>(0.f, 250.f / (2 * M_PI), .1f),
+            0.f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            Constants::ParameterIDs::COLLISION_DAMPING,
+            "Collision Damping",
+            juce::NormalisableRange<float>(0.f, 2.5f, .001f),
+            0.f
     ));
 
     return {params.begin(), params.end()};

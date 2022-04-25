@@ -103,6 +103,8 @@ public:
 
     void damp();
 
+    void setCollisionParameters(float normalisedPos, float stiffness, float omega1, float damping);
+
 protected:
     /**
      * Convert from a 60 dB decay time to a frequency independent decay.

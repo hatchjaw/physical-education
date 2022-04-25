@@ -75,10 +75,6 @@ FType Resonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     // Separate the integer and fractional parts of the read position.
     float readPos;
     auto alpha = modf(outputPositions[outputPositionIndex], &readPos);
-    // Adjust amplitude wrt the output position. Positions close to the
-    // centre have greater displacement than positions at the extremities.
-    // TODO: maybe get rid of this, as it probably only holds for strings.
-    auto positionAdjustment = 2 * fabs(normalisedOutputPositions[outputPositionIndex] - .5);
 
     // Get the displacement, interpolated around the read position.
     auto displacement = Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
@@ -87,15 +83,19 @@ FType Resonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     uOut[0][outputPositionIndex] = displacement;
 
     switch (outputMode) {
-        case DISPLACEMENT:
+        case DISPLACEMENT: {
+            // Adjust amplitude wrt the output position. Positions close to the
+            // centre have greater displacement than positions at the extremities.
+            // TODO: maybe get rid of this, as it probably only holds for strings.
+            auto positionAdjustment = 2 * fabs(normalisedOutputPositions[outputPositionIndex] - .5);
             // Just return the appropriately scaled displacement.
             return getOutputScalar() * sqrt(positionAdjustment) * displacement;
+        }
         case VELOCITY:
             // Return the appropriately scaled velocity, taken as the
             // difference between the current displacement and the displacement
             // two samples ago.
             return getOutputScalar() *
-                   sqrt(positionAdjustment) *
                    (1 / (2 * parameters.derived.k)) *
                    (displacement - uOut[2][outputPositionIndex]);
         default:
@@ -173,4 +173,12 @@ void Resonator::updateState() {
     }
     damper.applyCollision(u);
     advanceTimestep();
+}
+
+void Resonator::setCollisionParameters(float normalisedPos, float stiffness, float omega1, float damping) {
+    damper.setPosition(normalisedPos);
+    damper.setLinearOscillatorFrequency(stiffness);
+    damper.setNonlinearOscillatorFrequency(omega1);
+    damper.setLoss(damping);
+    damper.setupCollision();
 }

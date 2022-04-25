@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "../Parameters/ModelParameters.h"
+#include "../Parameters/SmoothedParameter.h"
 // No need to include Resonator.h for the friend class declaration, as this
 // header has been included from that very file.
 // Including it confuses the compiler.
@@ -32,7 +33,8 @@ protected:
 
     virtual void stopExcitation();
 
-    float position{0.f}, force{0.f}, velocity{0.f};
+    SmoothedParameter<float> position{0.f};
+    float force{0.f}, velocity{0.f};
 
     bool isExciting{false};
 

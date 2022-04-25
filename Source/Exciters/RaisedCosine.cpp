@@ -20,7 +20,7 @@ void RaisedCosine::startExcitation(float excitationPosition,
     auto halfWidth = .5f * excitationWidth;
 
     // Calculate the excitation position as a proportion of N.
-    auto pos = Utils::clamp(position, 0.f, 1.f);
+    auto pos = Utils::clamp(position.getNext(), 0.f, 1.f);
     // Find the nearest integer start index; also ensure the excitation can't
     // exceed the bounds of the grid, and respect the boundary conditions.
     start = static_cast<unsigned int>(std::min(

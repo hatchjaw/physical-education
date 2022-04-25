@@ -9,7 +9,7 @@ Exciter::Exciter(ModelParameters &parameters) : resonatorParameters(parameters) 
 void Exciter::startExcitation(float excitationPosition,
                               float excitationForce,
                               float excitationVelocity) {
-    position = excitationPosition;
+    position.set(excitationPosition);
     force = excitationForce;
     velocity = excitationVelocity;
     isExciting = true;

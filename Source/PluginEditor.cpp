@@ -13,15 +13,27 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
     outputModeComponent(audioProcessor.apvts, Constants::ParameterIDs::OUTPUT_MODE),
     outputPositionsComponent(audioProcessor.apvts, Constants::ParameterIDs::OUT_POS_1,
                              Constants::ParameterIDs::OUT_POS_2),
-    excitationTypeComponent(audioProcessor.apvts, Constants::ParameterIDs::EXCITATION_TYPE) {
+    excitationTypeComponent(audioProcessor.apvts, Constants::ParameterIDs::EXCITATION_TYPE),
+    collisionParamsComponent(audioProcessor.apvts,
+                             Constants::ParameterIDs::COLLISION_POS,
+                             Constants::ParameterIDs::COLLISION_STIFFNESS,
+                             Constants::ParameterIDs::COLLISION_OMEGA1,
+                             Constants::ParameterIDs::COLLISION_DAMPING) {
 
     setSize(800, 600);
 
+    // This has to be first, so everything else is drawn on top of it.
     addAndMakeVisible(displacementVisualiserComponent);
+
+//    addAndMakeVisible(resetButton);
+//    resetButton.setButtonText("Reset");
+//    resetButton.onClick = [this] { audioProcessor.resetVoices(); };
+
     addAndMakeVisible(outputPositionsComponent);
     // Got to add this after output position component else it can't be clicked.
     addAndMakeVisible(outputModeComponent);
     addAndMakeVisible(excitationTypeComponent);
+    addAndMakeVisible(collisionParamsComponent);
 }
 
 PhysicalEducationAudioProcessorEditor::~PhysicalEducationAudioProcessorEditor() {
@@ -37,6 +49,8 @@ void PhysicalEducationAudioProcessorEditor::resized() {
     auto height = getHeight();
     auto bottom = getBottom();
     auto right = getRight();
+
+//    resetButton.setBounds(right - 100, 0, 100, Constants::Layout::EXCITATION_TYPE_HEIGHT);
 
     displacementVisualiserComponent.setBounds(area);
 
@@ -54,5 +68,9 @@ void PhysicalEducationAudioProcessorEditor::resized() {
             Constants::Layout::OUTPUT_POSITIONS_HEIGHT
     );
 
-    excitationTypeComponent.setBounds(0, 0, Constants::Layout::EXCITATION_TYPE_WIDTH, 30);
+    excitationTypeComponent.setBounds(0, 0, Constants::Layout::EXCITATION_TYPE_WIDTH,
+                                      Constants::Layout::EXCITATION_TYPE_HEIGHT);
+
+    collisionParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5, width,
+                                       Constants::Layout::COLLISION_PARAMS_HEIGHT);
 }

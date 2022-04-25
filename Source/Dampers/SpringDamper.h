@@ -7,6 +7,7 @@
 
 
 #include "../Parameters/ModelParameters.h"
+#include "../Parameters/SmoothedParameter.h"
 
 class SpringDamper {
 public:
@@ -25,8 +26,8 @@ private:
 
     void applyCollision(std::vector<FType *> &state);
 
-    float position{.55f};
-    FType omega0{100.}, omega1{1000.}, sigmaP{.001};
+    SmoothedParameter<float> position{.5f};
+    SmoothedParameter<FType> omega0{100.}, omega1{1000.}, sigmaP{.001};
 
     ModelParameters &resonatorParameters;
 

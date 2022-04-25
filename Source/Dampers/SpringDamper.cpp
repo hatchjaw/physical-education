@@ -8,29 +8,32 @@ SpringDamper::SpringDamper(ModelParameters &parameters) : resonatorParameters(pa
 }
 
 void SpringDamper::setLinearOscillatorFrequency(FType frequency) {
-    omega0 = frequency * 2. * M_PI;
+    omega0.set(frequency * 2. * M_PI);
 }
 
 void SpringDamper::setNonlinearOscillatorFrequency(FType frequency) {
-    omega1 = frequency * 2. * M_PI;
+    omega1.set(frequency * 2. * M_PI);
 }
 
 void SpringDamper::setLoss(FType sigma) {
-    sigmaP = sigma;
+    sigmaP.set(sigma);
 }
 
 void SpringDamper::setPosition(float pos) {
-    position = pos;
+    position.set(pos);
 }
 
 void SpringDamper::setupCollision() {
     auto p = resonatorParameters.derived;
 
     coeffs = {
-            pow(omega0, 2) * .5,
-            pow(omega1, 4) * .5,
-            sigmaP / p.k
+            pow(omega0.getNext(), 2) * .5,
+            pow(omega1.getNext(), 4) * .5,
+            sigmaP.getNext() / p.k
     };
+
+    // Get next position, so it'll be updated even if no note is happening...
+    position.getNext();
 
     // On paper one would factor k^2 out of the force term and have it here,
     // but since it's a component of a and b in applyCollision(), just make use
@@ -41,9 +44,16 @@ void SpringDamper::setupCollision() {
 void SpringDamper::applyCollision(std::vector<FType *> &state) {
     auto p = resonatorParameters.derived;
 
+    // Got to recalculate coefficients to keep parameters up to date...
+    coeffs = {
+            pow(omega0.getNext(), 2) * .5,
+            pow(omega1.getNext(), 4) * .5,
+            sigmaP.getNext() / p.k
+    };
+
     // Restrict collision position so interpolation doesn't break.
     auto floatN = static_cast<float>(p.N);
-    auto posIndex = Utils::clamp(floatN * position, 4, floatN - 4);
+    auto posIndex = Utils::clamp(floatN * position.getNext(), 4, floatN - 4);
     auto alpha = modf(posIndex, &posIndex);
     auto collisionPos = static_cast<int>(posIndex);
 
