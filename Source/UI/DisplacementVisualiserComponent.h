@@ -7,11 +7,13 @@
 
 #include <JuceHeader.h>
 #include "../Utils.h"
+#include "../Exciters/Exciter.h"
+#include "../Resonators/Resonator.h"
 
 class DisplacementVisualiserComponent : public juce::Component,
                                         public juce::Timer {
 public:
-    DisplacementVisualiserComponent(std::vector<FType> &);
+    DisplacementVisualiserComponent(Resonator &);
 
     ~DisplacementVisualiserComponent() override;
 
@@ -23,9 +25,15 @@ public:
     void timerCallback() override;
 
 private:
+    const float PADDING_HORIZONTAL{10.f},
+            DAMPER_INDICATOR_DIAMETER{15.f},
+            BOW_INDICATOR_WIDTH{15.f},
+            BOW_INDICATOR_HEIGHT{175.f};
+
     juce::Path generateStatePath();
 
-    std::vector<FType> &displacement;
+    Resonator &resonator;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DisplacementVisualiserComponent)
 };
 

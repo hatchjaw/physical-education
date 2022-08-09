@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "Utils.h"
+#include "Resonators/Resonator.h"
 
 #define NUM_VOICES 1
 
@@ -76,6 +77,8 @@ public:
      * e.g. for visualisation.
      */
     std::vector<double> &getModelState() noexcept;
+
+    Resonator &getResonator();
 
 private:
     juce::Synthesiser physEdSynth;

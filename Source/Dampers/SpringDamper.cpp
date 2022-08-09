@@ -23,52 +23,45 @@ void SpringDamper::setPosition(float pos) {
     position.set(pos);
 }
 
-void SpringDamper::setupCollision() {
+void SpringDamper::setupInteraction() {
     auto p = resonatorParameters.derived;
 
-    coeffs = {
-            pow(omega0.getNext(), 2) * .5,
-            pow(omega1.getNext(), 4) * .5,
-            sigmaP.getNext() / p.k
-    };
-
-    // Get next position, so it'll be updated even if no note is happening...
-    position.getNext();
-
+    // TODO: reinstate rho*A and adjust parameter ranges.
     // On paper one would factor k^2 out of the force term and have it here,
-    // but since it's a component of a and b in applyCollision(), just make use
+    // but since it's a component of a and b in applyInteraction(), just make use
     // of it there.
-    collisionForceCoefficient = 1 / (resonatorParameters.rho * p.A * p.schemeDivisor);
+//    forceCoefficient = 1 / (resonatorParameters.rho * p.A * p.schemeDivisor);
+    forceCoefficient = 1 / (p.schemeDivisor);
 }
 
-void SpringDamper::applyCollision(std::vector<FType *> &state) {
+void SpringDamper::applyInteraction(std::vector<FType *> &state) {
     auto p = resonatorParameters.derived;
 
-    // Got to recalculate coefficients to keep parameters up to date...
+    // Recalculate coefficients to keep parameters up to date.
     coeffs = {
             pow(omega0.getNext(), 2) * .5,
             pow(omega1.getNext(), 4) * .5,
             sigmaP.getNext() / p.k
     };
 
-    // Restrict collision position so interpolation doesn't break.
+    // Restrict interaction position so interpolation doesn't break.
     auto floatN = static_cast<float>(p.N);
     auto posIndex = Utils::clamp(floatN * position.getNext(), 4, floatN - 4);
     auto alpha = modf(posIndex, &posIndex);
-    auto collisionPos = static_cast<int>(posIndex);
+    auto interactionPos = static_cast<int>(posIndex);
 
-    // Get a stencil's worth of interpolated state at the collision position.
+    // Get a stencil's worth of interpolated state at the damper position.
     std::vector<FType> eta = {
-            Utils::interpolate(state[1], collisionPos - 2, alpha),
-            Utils::interpolate(state[1], collisionPos - 1, alpha),
-            Utils::interpolate(state[1], collisionPos, alpha),
-            Utils::interpolate(state[1], collisionPos + 1, alpha),
-            Utils::interpolate(state[1], collisionPos + 2, alpha),
+            Utils::interpolate(state[1], interactionPos - 2, alpha),
+            Utils::interpolate(state[1], interactionPos - 1, alpha),
+            Utils::interpolate(state[1], interactionPos, alpha),
+            Utils::interpolate(state[1], interactionPos + 1, alpha),
+            Utils::interpolate(state[1], interactionPos + 2, alpha),
     };
     std::vector<FType> etaPrev = {
-            Utils::interpolate(state[2], collisionPos - 1, alpha),
-            Utils::interpolate(state[2], collisionPos, alpha),
-            Utils::interpolate(state[2], collisionPos + 1, alpha),
+            Utils::interpolate(state[2], interactionPos - 1, alpha),
+            Utils::interpolate(state[2], interactionPos, alpha),
+            Utils::interpolate(state[2], interactionPos + 1, alpha),
     };
 
     // Compute some force equation components.
@@ -76,7 +69,7 @@ void SpringDamper::applyCollision(std::vector<FType *> &state) {
     auto a = p.kSq * (q + coeffs[2]);
     auto b = p.kSq * (q - coeffs[2]);
 
-    // Compute eta^{n+1}, the next displacement at the collision position.
+    // Compute eta^{n+1}, the next displacement at the interaction position.
     // Plug a and b into the modified update equation. It's the stiff string
     // with a added to the divisor, and b added to the coefficient for u_p^{n-1}.
     auto etaNext = (
@@ -87,10 +80,10 @@ void SpringDamper::applyCollision(std::vector<FType *> &state) {
                            p.rawCoeffs[5] * (etaPrev[0] + etaPrev[2])
                    ) / (p.schemeDivisor + a);
 
-    // Armed with eta^{n+1}, F, the collision force, can be found.
-    auto collisionForce = -(a * etaNext + b * etaPrev[1]);
+    // Armed with eta^{n+1}, F, the damper force, can be found.
+    auto damperForce = -(a * etaNext + b * etaPrev[1]);
 
-    // Apply the collision force.
-    Utils::extrapolate(state[0], collisionPos, alpha, p.h, collisionForce * collisionForceCoefficient);
+    // Apply the damper force.
+    Utils::extrapolate(state[0], interactionPos, alpha, p.h, damperForce * forceCoefficient);
 }
 

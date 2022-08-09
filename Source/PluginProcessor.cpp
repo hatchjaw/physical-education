@@ -158,10 +158,10 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
             apvts.getRawParameterValue(Constants::ParameterIDs::EXCITATION_TYPE)->load()
     )];
     auto friction = apvts.getRawParameterValue(Constants::ParameterIDs::FRICTION)->load();
-    auto collisionPos = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_POS)->load();
-    auto collisionStiffness = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_STIFFNESS)->load();
-    auto collisionOmega1 = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_OMEGA1)->load();
-    auto collisionDamping = apvts.getRawParameterValue(Constants::ParameterIDs::COLLISION_DAMPING)->load();
+    auto damperPos = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_POS)->load();
+    auto damperStiffness = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_STIFFNESS)->load();
+    auto damperNonlinearity = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_NONLINEARITY)->load();
+    auto damperLoss = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_LOSS)->load();
 
     // Update parameters
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
@@ -170,7 +170,8 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
 
             resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
             resonator->setOutputMode(outputMode);
-            resonator->setCollisionParameters(collisionPos, collisionStiffness, collisionOmega1, collisionDamping);
+            resonator->setDamperParameters(damperPos, damperStiffness, damperNonlinearity,
+                                           damperLoss);
 
             if (excitationType != currentExciter) {
                 currentExciter = excitationType;
@@ -226,9 +227,18 @@ std::vector<double> &PhysicalEducationAudioProcessor::getModelState() noexcept {
     }
 }
 
+Resonator &PhysicalEducationAudioProcessor::getResonator() {
+    for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
+            return voice->getResonatorRef();
+        }
+    }
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout
 PhysicalEducationAudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    auto fPI = static_cast<float>(M_PI);
 
     params.push_back(std::make_unique<juce::AudioParameterChoice>(
             Constants::ParameterIDs::EXCITATION_TYPE,
@@ -266,30 +276,30 @@ PhysicalEducationAudioProcessor::createParams() {
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            Constants::ParameterIDs::COLLISION_POS,
-            "Collision Position",
+            Constants::ParameterIDs::DAMPER_POS,
+            "Damper Position",
             juce::NormalisableRange<float>(0.f, 1.f, .001f),
             0.f
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            Constants::ParameterIDs::COLLISION_STIFFNESS,
-            "Collision Stiffness",
-            juce::NormalisableRange<float>(0.f, 250.f / (2 * M_PI), .1f),
+            Constants::ParameterIDs::DAMPER_STIFFNESS,
+            "Damper Stiffness",
+            juce::NormalisableRange<float>(0.f, 1000.f, .1f),
             0.f
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            Constants::ParameterIDs::COLLISION_OMEGA1,
-            "Collision Omega1",
-            juce::NormalisableRange<float>(0.f, 250.f / (2 * M_PI), .1f),
+            Constants::ParameterIDs::DAMPER_NONLINEARITY,
+            "Damper Nonlinearity",
+            juce::NormalisableRange<float>(0.f, 1000.f, .1f),
             0.f
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
-            Constants::ParameterIDs::COLLISION_DAMPING,
-            "Collision Damping",
-            juce::NormalisableRange<float>(0.f, 2.5f, .001f),
+            Constants::ParameterIDs::DAMPER_LOSS,
+            "Damper Loss",
+            juce::NormalisableRange<float>(0.f, 200.f, .01f),
             0.f
     ));
 

@@ -36,6 +36,8 @@ public:
      */
     void setOutputPositions(std::vector<float> outputPositionsToUse);
 
+    void setOutputPosition(unsigned long positionIndex, FType normalisedPosition);
+
     /**
      * Set the output mode; use either DISPLACEMENT or VELOCITY.
      * @param mode
@@ -103,7 +105,15 @@ public:
 
     void damp();
 
-    void setCollisionParameters(float normalisedPos, float stiffness, float omega1, float damping);
+    void setDamperParameters(float normalisedPos, float stiffness, float nonlinearity, float damping);
+
+    void setDamperPosition(float normalisedPosition);
+
+    FType getDamperPosition();
+
+    FType getExcitationPosition();
+
+    void updateSmoothedParams();
 
 protected:
     /**
@@ -113,7 +123,7 @@ protected:
      */
     static FType t60ToSigma0(FType t60);
 
-    FType t60ToSigma1(FType t60_0, FType t60_1, FType omega);
+    FType t60ToSigma1(FType t60_0, FType t60_1, FType omega = 1000.);
 
     /**
      * Compute the model coefficients.

@@ -15,7 +15,7 @@ bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
 }
 
 void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numOutputChannels) {
-    this->resonator->setDecayTimes(13.5, 3000);
+    this->resonator->setDecayTimes(13.5, 1.3323);// 3000);
     if (auto model = dynamic_cast<StiffString *>(this->resonator)) {
         model->setDensity(7850.);
         model->setRadius(.0005);
@@ -56,6 +56,9 @@ void PhysEdVoice::renderNextBlock(
     jassert(this->isPrepared);
 
     if (!this->isVoiceActive()) {
+        while (--numSamples >= 0) {
+            resonator->updateSmoothedParams();
+        }
         return;
     }
 
@@ -70,9 +73,9 @@ void PhysEdVoice::renderNextBlock(
     startSample = 0;
 
     while (--numSamples >= 0) {
-        this->resonator->updateState();
+        resonator->updateState();
 
-        auto samples = this->resonator->getOutput(numChannels);
+        auto samples = resonator->getOutput(numChannels);
 
         for (auto i = (int) this->buffer.getNumChannels(); --i >= 0;) {
             auto sample = Utils::clamp(samples[i], -1.0f, 1.0f);
@@ -99,4 +102,8 @@ std::vector<FType> &PhysEdVoice::getResonatorState() {
 
 Resonator *PhysEdVoice::getResonator() {
     return resonator;
+}
+
+Resonator &PhysEdVoice::getResonatorRef() {
+    return *resonator;
 }

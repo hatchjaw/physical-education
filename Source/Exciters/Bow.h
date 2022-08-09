@@ -15,10 +15,6 @@ public:
 
     void setupExcitation() override;
 
-    void startExcitation(float excitationPosition,
-                         float excitationForce,
-                         float excitationVelocity) override;
-
     void setFriction(FType friction);
 
 protected:

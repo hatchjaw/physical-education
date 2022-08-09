@@ -13,7 +13,7 @@ class SpringDamper {
 public:
     explicit SpringDamper(ModelParameters &parameters);
 
-    void setupCollision();
+    void setupInteraction();
 
 private:
     void setLinearOscillatorFrequency(FType);
@@ -24,10 +24,10 @@ private:
 
     void setPosition(float);
 
-    void applyCollision(std::vector<FType *> &state);
+    void applyInteraction(std::vector<FType *> &state);
 
-    SmoothedParameter<float> position{.5f};
-    SmoothedParameter<FType> omega0{100.}, omega1{1000.}, sigmaP{.001};
+    SmoothedParameter<float> position{0.f};
+    SmoothedParameter<FType> omega0{0.}, omega1{0.}, sigmaP{0.};
 
     ModelParameters &resonatorParameters;
 
@@ -35,7 +35,7 @@ private:
      * Derived coefficients.
      */
     std::vector<FType> coeffs;
-    FType collisionForceCoefficient{0.0};
+    FType forceCoefficient{0.0};
 
     friend class Resonator;
 };

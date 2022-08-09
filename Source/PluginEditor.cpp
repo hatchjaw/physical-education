@@ -9,16 +9,16 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
         PhysicalEducationAudioProcessor &p
 ) : AudioProcessorEditor(&p),
     audioProcessor(p),
-    displacementVisualiserComponent(audioProcessor.getModelState()),
+    displacementVisualiserComponent(audioProcessor.getResonator()),
     outputModeComponent(audioProcessor.apvts, Constants::ParameterIDs::OUTPUT_MODE),
     outputPositionsComponent(audioProcessor.apvts, Constants::ParameterIDs::OUT_POS_1,
                              Constants::ParameterIDs::OUT_POS_2),
     excitationTypeComponent(audioProcessor.apvts, Constants::ParameterIDs::EXCITATION_TYPE),
-    collisionParamsComponent(audioProcessor.apvts,
-                             Constants::ParameterIDs::COLLISION_POS,
-                             Constants::ParameterIDs::COLLISION_STIFFNESS,
-                             Constants::ParameterIDs::COLLISION_OMEGA1,
-                             Constants::ParameterIDs::COLLISION_DAMPING) {
+    damperParamsComponent(audioProcessor.apvts,
+                          Constants::ParameterIDs::DAMPER_POS,
+                          Constants::ParameterIDs::DAMPER_STIFFNESS,
+                          Constants::ParameterIDs::DAMPER_NONLINEARITY,
+                          Constants::ParameterIDs::DAMPER_LOSS) {
 
     setSize(800, 600);
 
@@ -33,7 +33,7 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
     // Got to add this after output position component else it can't be clicked.
     addAndMakeVisible(outputModeComponent);
     addAndMakeVisible(excitationTypeComponent);
-    addAndMakeVisible(collisionParamsComponent);
+    addAndMakeVisible(damperParamsComponent);
 }
 
 PhysicalEducationAudioProcessorEditor::~PhysicalEducationAudioProcessorEditor() {
@@ -71,6 +71,6 @@ void PhysicalEducationAudioProcessorEditor::resized() {
     excitationTypeComponent.setBounds(0, 0, Constants::Layout::EXCITATION_TYPE_WIDTH,
                                       Constants::Layout::EXCITATION_TYPE_HEIGHT);
 
-    collisionParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5, width,
-                                       Constants::Layout::COLLISION_PARAMS_HEIGHT);
+    damperParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5, width,
+                                    Constants::Layout::DAMPER_PARAMS_HEIGHT);
 }

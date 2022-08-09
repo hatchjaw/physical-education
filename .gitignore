@@ -37,4 +37,4 @@
 **/JuceLibraryCode
 
 # cmake stuff
-**/cmake-build-debug
+**/cmake-build-*

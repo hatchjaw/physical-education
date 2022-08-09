@@ -28,14 +28,6 @@ void Bow::setupExcitation() {
     excitationCoefficient = (p.kSq * phi1) / (resonatorParameters.rho * p.A * p.schemeDivisor);
 }
 
-void Bow::startExcitation(float excitationPosition,
-                          float excitationForce,
-                          float excitationVelocity) {
-    Exciter::startExcitation(excitationPosition,
-                             excitationForce * FORCE_SCALAR,
-                             excitationVelocity * VELOCITY_SCALAR);
-}
-
 void Bow::applyExcitation(std::vector<FType *> &state) {
     auto p = resonatorParameters.derived;
 
@@ -43,51 +35,57 @@ void Bow::applyExcitation(std::vector<FType *> &state) {
     // The model uses bow position ± 2, and interpolation/extrapolation use
     // l-1 ≤ l ≤ l+2, so keep bow position in range 4 ≤ bp ≤ N-4
     auto floatN = static_cast<float>(p.N);
+    // Always update the bow position, irrespective of whether excitation is
+    // active.
     auto bowIndex = Utils::clamp(floatN * position.getNext(), 4, floatN - 4);
-    auto alpha = modf(bowIndex, &bowIndex);
-    auto bowPos = static_cast<int>(bowIndex);
 
-    std::vector<FType> uB = {
-            Utils::interpolate(state[1], bowPos - 2, alpha),
-            Utils::interpolate(state[1], bowPos - 1, alpha),
-            Utils::interpolate(state[1], bowPos, alpha),
-            Utils::interpolate(state[1], bowPos + 1, alpha),
-            Utils::interpolate(state[1], bowPos + 2, alpha),
-    };
-    std::vector<FType> uBPrev = {
-            Utils::interpolate(state[2], bowPos - 1, alpha),
-            Utils::interpolate(state[2], bowPos, alpha),
-            Utils::interpolate(state[2], bowPos + 1, alpha),
-    };
+    if (isExciting) {
+        auto alpha = modf(bowIndex, &bowIndex);
+        auto bowPos = static_cast<int>(bowIndex);
 
-    auto b = coeffs[0] * velocity +
-             coeffs[1] * uB[2] +
-             coeffs[2] * uBPrev[1] +
-             coeffs[3] * (uB[1] + uB[3]) +
-             coeffs[4] * (uBPrev[0] + uBPrev[2]) +
-             coeffs[5] * (uB[0] + uB[4]);
+        std::vector<FType> uB = {
+                Utils::interpolate(state[1], bowPos - 2, alpha),
+                Utils::interpolate(state[1], bowPos - 1, alpha),
+                Utils::interpolate(state[1], bowPos, alpha),
+                Utils::interpolate(state[1], bowPos + 1, alpha),
+                Utils::interpolate(state[1], bowPos + 2, alpha),
+        };
+        std::vector<FType> uBPrev = {
+                Utils::interpolate(state[2], bowPos - 1, alpha),
+                Utils::interpolate(state[2], bowPos, alpha),
+                Utils::interpolate(state[2], bowPos + 1, alpha),
+        };
 
-    auto vRel = 0.0, vRelPrev = 0.0;
-    auto nrScaledForce = force / (resonatorParameters.rho * p.A);
+        auto b = coeffs[0] * velocity * VELOCITY_SCALAR +
+                 coeffs[1] * uB[2] +
+                 coeffs[2] * uBPrev[1] +
+                 coeffs[3] * (uB[1] + uB[3]) +
+                 coeffs[4] * (uBPrev[0] + uBPrev[2]) +
+                 coeffs[5] * (uB[0] + uB[4]);
 
-    for (unsigned int i = 0; i < MAX_NR_ITERATIONS; ++i) {
-        auto vRelPrevSq = pow(vRelPrev, 2);
-        auto nr2 = phi1 * nrScaledForce * exp(-a * vRelPrevSq);
+        auto vRel = 0.0, vRelPrev = 0.0;
+        auto f = force * FORCE_SCALAR;
+        auto nrScaledForce = f / (resonatorParameters.rho * p.A);
 
-        vRel = vRelPrev -
-               (nr1 * vRelPrev + nr2 * vRelPrev + b) /
-               (nr1 + nr2 * (1 - 2 * a * vRelPrevSq));
-        // threshold check
-        if (fabs(vRel - vRelPrev) < NR_TOLERANCE) {
-            break;
+        for (unsigned int i = 0; i < MAX_NR_ITERATIONS; ++i) {
+            auto vRelPrevSq = pow(vRelPrev, 2);
+            auto nr2 = phi1 * nrScaledForce * exp(-a * vRelPrevSq);
+
+            vRel = vRelPrev -
+                   (nr1 * vRelPrev + nr2 * vRelPrev + b) /
+                   (nr1 + nr2 * (1 - 2 * a * vRelPrevSq));
+            // threshold check
+            if (fabs(vRel - vRelPrev) < NR_TOLERANCE) {
+                break;
+            }
+            vRelPrev = vRel;
         }
-        vRelPrev = vRel;
+
+        auto excitation = excitationCoefficient * f * vRel * exp(-a * pow(vRel, 2));
+
+        // Apply the excitation.
+        Utils::extrapolate(state[0], bowPos, alpha, p.h, -excitation);
     }
-
-    auto excitation = excitationCoefficient * force * vRel * exp(-a * pow(vRel, 2));
-
-    // Apply the excitation.
-    Utils::extrapolate(state[0], bowPos, alpha, p.h, -excitation);
 }
 
 void Bow::stopExcitation() {

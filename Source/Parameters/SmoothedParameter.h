@@ -10,14 +10,14 @@ class SmoothedParameter {
 public:
     explicit SmoothedParameter(T initialValue);
 
-    void set(T targetValue);
+    void set(T targetValue, bool skipSmoothing = false);
 
     T getNext();
 
     T &getCurrent();
 
 private:
-    static constexpr T MULTIPLIER{.1}, THRESHOLD{1e-6};
+    static constexpr T MULTIPLIER{.001f}, THRESHOLD{1e-6};
     T current, target;
 };
 
@@ -28,13 +28,16 @@ SmoothedParameter<T>::SmoothedParameter(T initialValue) {
 }
 
 template<typename T>
-void SmoothedParameter<T>::set(T targetValue) {
+void SmoothedParameter<T>::set(T targetValue, bool skipSmoothing) {
     target = targetValue;
+    if (skipSmoothing) {
+        current = target;
+    }
 }
 
 template<typename T>
 T SmoothedParameter<T>::getNext() {
-    if (current != target) {
+     if (current != target) {
         auto delta = target - current;
         auto absDelta = abs(delta);
         if (absDelta < THRESHOLD) {

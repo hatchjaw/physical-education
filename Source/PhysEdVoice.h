@@ -41,6 +41,8 @@ public:
 
     Resonator *getResonator();
 
+    Resonator &getResonatorRef();
+
 private:
     bool isPrepared;
     Resonator *resonator;

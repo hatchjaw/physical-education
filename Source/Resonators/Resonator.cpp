@@ -18,6 +18,7 @@ void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
     parameters.derived.sigma0 = t60ToSigma0(parameters.T60_0);
     parameters.T60_1 = freqDependent;
     parameters.derived.sigma1 = t60ToSigma0(parameters.T60_1);
+//    parameters.derived.sigma1 = t60ToSigma1(parameters.T60_0, parameters.T60_1);
 }
 
 void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
@@ -32,11 +33,15 @@ void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
 
     // TODO: prevent discontinuities when output positions change.
     for (unsigned long i = 0; i < outputPositionsToUse.size(); ++i) {
-        auto position = Utils::clamp(outputPositionsToUse[i], 0.f, 1.f);
-        normalisedOutputPositions[i] = position;
-        position *= static_cast<float>(parameters.derived.N);
-        outputPositions[i] = position;
+        setOutputPosition(i, outputPositionsToUse[i]);
     }
+}
+
+void Resonator::setOutputPosition(unsigned long positionIndex, FType normalisedPosition) {
+    auto position = Utils::clamp(normalisedPosition, 0.f, 1.f);
+    normalisedOutputPositions[positionIndex] = position;
+    position *= static_cast<float>(parameters.derived.N);
+    outputPositions[positionIndex] = position;
 }
 
 void Resonator::setOutputMode(Resonator::OutputMode mode) {
@@ -53,7 +58,7 @@ void Resonator::initialiseModel(FType sampleRate) {
     parameters.derived.kSq = pow(parameters.derived.k, 2);
     computeCoefficients();
     exciter->setupExcitation();
-    damper.setupCollision();
+    damper.setupInteraction();
     initialiseState();
     isInitialised = true;
 }
@@ -119,14 +124,14 @@ FType Resonator::t60ToSigma0(FType t60) {
     return (6. * log(10.)) / t60;
 }
 
-FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega = 1000.) {
+FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega) {
 //    zeta1 = (-gamma^2+sqrt(gamma^4+4*K^2*(2*pi*loss(1,1))^2))/(2*K^2);
 //    zeta2 = (-gamma^2+sqrt(gamma^4+4*K^2*(2*pi*loss(2,1))^2))/(2*K^2);
 //    sig0 = 6*log(10)*(-zeta2/loss(1,2)+zeta1/loss(2,2))/(zeta1-zeta2);
 //    sig1 = 6*log(10)*(1/loss(1,2)-1/loss(2,2))/(zeta1-zeta2);
 
     auto p = parameters.derived;
-    auto z1 = (-p.cSq + sqrt(pow(p.c, 4) + 4 * p.kappaSq * pow(2 * M_PI * 1000., 2))) / (2 * p.kappaSq);
+    auto z1 = (-p.cSq + sqrt(pow(p.c, 4) + 4 * p.kappaSq * pow(2 * M_PI * omega, 2))) / (2 * p.kappaSq);
 
     if (p.kappa == 0) {
         z1 = pow(2 * M_PI * omega, 2) / (p.cSq);
@@ -168,17 +173,35 @@ void Resonator::advanceTimestep() {
 void Resonator::updateState() {
     jassert(isInitialised);
     computeScheme();
-    if (exciter->isExciting) {
-        exciter->applyExcitation(u);
-    }
-    damper.applyCollision(u);
+    exciter->applyExcitation(u);
+    damper.applyInteraction(u);
     advanceTimestep();
 }
 
-void Resonator::setCollisionParameters(float normalisedPos, float stiffness, float omega1, float damping) {
+void Resonator::setDamperParameters(float normalisedPos, float stiffness, float nonlinearity, float damping) {
     damper.setPosition(normalisedPos);
     damper.setLinearOscillatorFrequency(stiffness);
-    damper.setNonlinearOscillatorFrequency(omega1);
+    damper.setNonlinearOscillatorFrequency(nonlinearity);
     damper.setLoss(damping);
-    damper.setupCollision();
+    damper.setupInteraction();
+}
+
+void Resonator::setDamperPosition(float normalisedPosition) {
+    damper.setPosition(normalisedPosition);
+}
+
+FType Resonator::getDamperPosition() {
+    return damper.position.getCurrent();
+}
+
+FType Resonator::getExcitationPosition() {
+    return exciter->position.getCurrent();
+}
+
+void Resonator::updateSmoothedParams() {
+    exciter->position.getNext();
+    damper.position.getNext();
+    damper.sigmaP.getNext();
+    damper.omega0.getNext();
+    damper.omega1.getNext();
 }

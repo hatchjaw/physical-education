@@ -24,6 +24,10 @@ public:
             float excitationVelocity
     );
 
+    float getVelocity() const;
+
+    float getForce() const;
+
 protected:
     void setForce(float);
 

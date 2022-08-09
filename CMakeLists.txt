@@ -86,7 +86,7 @@ target_sources(PhysicalEducation
         Source/UI/OutputPositionsComponent.cpp
         Source/UI/OutputModeComponent.cpp
         Source/UI/FrictionSliderComponent.cpp
-        Source/UI/CollisionParamsComponent.cpp)
+        Source/UI/DamperParamsComponent.cpp)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
@@ -127,13 +127,15 @@ target_link_libraries(PhysicalEducation
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
-# Sign targets to allow debugging without elevated privileges
-add_custom_command(TARGET PhysicalEducation
-        POST_BUILD
-        COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
-        ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/Debug/AU/PhysicalEducation.component)
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+    # Sign targets to allow debugging without elevated privileges
+    add_custom_command(TARGET PhysicalEducation
+            POST_BUILD
+            COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
+            ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/${CMAKE_BUILD_TYPE}/AU/PhysicalEducation.component)
 
-add_custom_command(TARGET PhysicalEducation
-        POST_BUILD
-        COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
-        ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/Debug/Standalone/PhysicalEducation.app)
+    add_custom_command(TARGET PhysicalEducation
+            POST_BUILD
+            COMMAND /bin/sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/add_debug_entitlement.sh
+            ${PROJECT_BINARY_DIR}/PhysicalEducation_artefacts/${CMAKE_BUILD_TYPE}/Standalone/PhysicalEducation.app)
+endif ()

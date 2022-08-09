@@ -28,3 +28,11 @@ void Exciter::setVelocity(float velocityToUse) {
 void Exciter::setForce(float forceToUse) {
     force = forceToUse;
 }
+
+float Exciter::getVelocity() const {
+    return velocity;
+}
+
+float Exciter::getForce() const {
+    return force;
+}

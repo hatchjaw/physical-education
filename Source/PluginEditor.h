@@ -11,7 +11,7 @@
 #include "UI/OutputModeComponent.h"
 #include "UI/OutputPositionsComponent.h"
 #include "UI/ExcitationTypeComponent.h"
-#include "UI/CollisionParamsComponent.h"
+#include "UI/DamperParamsComponent.h"
 
 class PhysicalEducationAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -35,7 +35,7 @@ private:
     OutputModeComponent outputModeComponent;
     OutputPositionsComponent outputPositionsComponent;
     ExcitationTypeComponent excitationTypeComponent;
-    CollisionParamsComponent collisionParamsComponent;
+    DamperParamsComponent damperParamsComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhysicalEducationAudioProcessorEditor)
 };

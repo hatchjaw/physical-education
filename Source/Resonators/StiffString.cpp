@@ -41,6 +41,8 @@ void StiffString::setDerivedParameters() {
             p->c = sqrt(p->cSq);
             p->kappaSq = parameters.E * p->I / rhoA;
             p->kappa = sqrt(p->kappaSq);
+
+            p->sigma1 = t60ToSigma1(parameters.T60_0, parameters.T60_1);
         }
     }
 }
@@ -116,6 +118,53 @@ void StiffString::computeScheme() {
                   coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
                   coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
     }
+
+    // Circular string...
+//    unsigned int N = parameters.derived.N;
+//    auto NoverTwo = static_cast<unsigned int>(floor(N / 2));
+//    unsigned int l = 0;
+//    u[0][l] = coeffs[0] * u[1][l] +
+//              coeffs[2] * u[2][l] +
+//              coeffs[3] * (u[1][l + 2] + u[1][N - 1]) +
+//              coeffs[4] * (u[1][l + 1] + u[1][N]) +
+//              coeffs[5] * (u[2][l + 1] + u[2][N]);
+//
+//    l = 1;
+//    u[0][l] = coeffs[0] * u[1][l] +
+//              coeffs[2] * u[2][l] +
+//              coeffs[3] * (u[1][l + 2] + u[1][N]) +
+//              coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
+//              coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
+//
+//    for (l = 2; l < NoverTwo; ++l) {
+//        u[0][l] = coeffs[0] * u[1][l] +
+//                  coeffs[2] * u[2][l] +
+//                  coeffs[3] * (u[1][l + 2] + u[1][l - 2]) +
+//                  coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
+//                  coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
+//    }
+//
+//    for (l = NoverTwo + 1; l < N - 1; ++l) {
+//        u[0][l] = coeffs[0] * u[1][l] +
+//                  coeffs[2] * u[2][l] +
+//                  coeffs[3] * (u[1][l + 2] + u[1][l - 2]) +
+//                  coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
+//                  coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
+//    }
+//
+//    l = N - 1;
+//    u[0][l] = coeffs[0] * u[1][l] +
+//              coeffs[2] * u[2][l] +
+//              coeffs[3] * (u[1][0] + u[1][l - 2]) +
+//              coeffs[4] * (u[1][l + 1] + u[1][l - 1]) +
+//              coeffs[5] * (u[2][l + 1] + u[2][l - 1]);
+//
+//    l = N;
+//    u[0][l] = coeffs[0] * u[1][l] +
+//              coeffs[2] * u[2][l] +
+//              coeffs[3] * (u[1][1] + u[1][l - 2]) +
+//              coeffs[4] * (u[1][0] + u[1][l - 1]) +
+//              coeffs[5] * (u[2][0] + u[2][l - 1]);
 }
 
 FType StiffString::getOutputScalar() {
