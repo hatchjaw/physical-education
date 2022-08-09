@@ -15,10 +15,7 @@ Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exc
 
 void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
     parameters.T60_0 = freqIndependent;
-    parameters.derived.sigma0 = t60ToSigma0(parameters.T60_0);
     parameters.T60_1 = freqDependent;
-    parameters.derived.sigma1 = t60ToSigma0(parameters.T60_1);
-//    parameters.derived.sigma1 = t60ToSigma1(parameters.T60_0, parameters.T60_1);
 }
 
 void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
@@ -143,6 +140,40 @@ FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega) {
 
     return (6 * log(10) / z1) * (1 / t60_1 - 1 / t60_0);
 }
+
+std::pair<FType, FType> Resonator::t60ToSigma(FType t60_0, FType t60_1, FType omega0, FType omega1) const {
+    auto p = parameters.derived;
+    auto cSqSq = pow(p.cSq, 2);
+    auto sixLogTen = 6 * log(10);
+    auto sigmas = std::pair<FType, FType>{};
+    auto twoPI = 2 * M_PI;
+
+    // If this isn't a stiff resonator, just calculate damping based on
+    // wavespeed.
+    if (p.kappa == 0) {
+        auto zeta = pow(twoPI * omega1, 2) / (p.cSq);
+
+        sigmas.first = sixLogTen / t60_1;
+        sigmas.second = (sixLogTen * (1 / t60_1 - 1 / t60_0)) / zeta;
+    } else {
+        auto zeta1 = 0., zeta2 = 0.;
+        // If this resonator is exclusively stiff, just use kappa.
+        if (p.c == 0) {
+            zeta1 = twoPI * omega0 / p.kappa;
+            zeta2 = twoPI * omega1 / p.kappa;
+        } else {
+            // Otherwise do the full thing.
+            zeta1 = (-p.cSq + sqrt(cSqSq + 4 * p.kappaSq * pow(twoPI * omega0, 2))) / (2 * p.kappaSq);
+            zeta2 = (-p.cSq + sqrt(cSqSq + 4 * p.kappaSq * pow(twoPI * omega1, 2))) / (2 * p.kappaSq);
+        }
+
+        sigmas.first = sixLogTen * (zeta1 / t60_1 - zeta2 / t60_0) / (zeta1 - zeta2);
+        sigmas.second = sixLogTen * (1 / t60_0 - 1 / t60_1) / (zeta1 - zeta2);
+    }
+
+    return sigmas;
+}
+
 
 void Resonator::initialiseState() {
     Utils::setupVectorPointers(u, uStates, stencilDimensions.second, parameters.derived.N + 1);

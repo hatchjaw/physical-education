@@ -42,7 +42,9 @@ void StiffString::setDerivedParameters() {
             p->kappaSq = parameters.E * p->I / rhoA;
             p->kappa = sqrt(p->kappaSq);
 
-            p->sigma1 = t60ToSigma1(parameters.T60_0, parameters.T60_1);
+            auto sigmas = t60ToSigma(parameters.T60_0, parameters.T60_1);
+            p->sigma0 = sigmas.first;
+            p->sigma1 = sigmas.second;
         }
     }
 }

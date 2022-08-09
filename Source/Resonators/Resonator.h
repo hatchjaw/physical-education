@@ -126,6 +126,16 @@ protected:
     FType t60ToSigma1(FType t60_0, FType t60_1, FType omega = 1000.);
 
     /**
+     * From Bilbao, p. 178 & p. 400
+     * @param t60_0
+     * @param t60_1
+     * @param omega0
+     * @param omega1
+     * @return sigma_0 and sigma_1 as a pair.
+     */
+    std::pair<FType, FType> t60ToSigma(FType t60_0, FType t60_1, FType omega0 = 100., FType omega1 = 1000.) const;
+
+    /**
      * Compute the model coefficients.
      * NB. sample rate must be set before calling this method.
      */

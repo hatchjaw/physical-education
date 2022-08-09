@@ -15,7 +15,7 @@ bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
 }
 
 void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numOutputChannels) {
-    this->resonator->setDecayTimes(13.5, 1.3323);// 3000);
+    this->resonator->setDecayTimes(12.5, 1.3323);
     if (auto model = dynamic_cast<StiffString *>(this->resonator)) {
         model->setDensity(7850.);
         model->setRadius(.0005);
