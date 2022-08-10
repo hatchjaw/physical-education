@@ -38,3 +38,7 @@
 
 # cmake stuff
 **/cmake-build-*
+**/build
+
+# IDE stuff
+/.vscode

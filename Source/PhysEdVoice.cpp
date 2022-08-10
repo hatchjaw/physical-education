@@ -7,6 +7,7 @@
 #include "Resonators/StiffString.h"
 #include "Utils.h"
 #include "Exciters/Bow.h"
+#include "Resonators/Dynamic1dWave.h"
 
 PhysEdVoice::~PhysEdVoice() = default;
 
@@ -24,7 +25,16 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
             exciter->setFriction(100.);
         }
+    } else if (auto model = dynamic_cast<Dynamic1dWave *>(this->resonator)) {
+        model->setLength(.93);
+        model->setDensity(1000.);
+        model->setRadius(9e-4);
+        model->setTension(2500.);
+        if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
+            exciter->setFriction(100.);
+        }
     }
+
     this->resonator->initialiseModel(static_cast<float>(sampleRate));
     this->resonator->setOutputPositions(std::vector<float>{.35f, .9f});
     this->resonator->setOutputMode(Resonator::OutputMode::VELOCITY);
@@ -104,6 +114,6 @@ Resonator *PhysEdVoice::getResonator() {
     return resonator;
 }
 
-Resonator &PhysEdVoice::getResonatorRef() {
-    return *resonator;
+Resonator *&PhysEdVoice::getResonatorPtr() {
+    return resonator;
 }

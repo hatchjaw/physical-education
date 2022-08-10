@@ -11,6 +11,7 @@ const int Constants::Layout::EXCITATION_TYPE_HEIGHT = 30;
 const int Constants::Layout::DAMPER_PARAMS_HEIGHT = 120;
 
 
+const juce::StringRef Constants::ParameterIDs::RESONATOR_TYPE = "RESONATOR_TYPE";
 const juce::StringRef Constants::ParameterIDs::EXCITATION_TYPE = "EXCITATION_TYPE";
 const juce::StringRef Constants::ParameterIDs::OUTPUT_MODE = "OUTPUT_MODE";
 const juce::StringRef Constants::ParameterIDs::OUT_POS_1 = "OUT_POS_1";
@@ -21,6 +22,11 @@ const juce::StringRef Constants::ParameterIDs::DAMPER_STIFFNESS = "DAMPER_STIFFN
 const juce::StringRef Constants::ParameterIDs::DAMPER_NONLINEARITY = "DAMPER_OMEGA1";
 const juce::StringRef Constants::ParameterIDs::DAMPER_LOSS = "DAMPER_LOSS";
 
+
+const juce::StringArray Constants::RESONATOR_TYPES = {
+        "Stiff String",
+        "Dynamic 1D Wave"
+};
 
 const juce::StringArray Constants::EXCITATION_TYPES = {
         "Raised Cosine",

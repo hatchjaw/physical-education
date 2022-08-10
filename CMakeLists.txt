@@ -80,7 +80,10 @@ target_sources(PhysicalEducation
         Source/Exciters/RaisedCosine.cpp
         Source/Exciters/Bow.cpp
         Source/Resonators/Resonator.cpp
+        Source/Resonators/DynamicResonator.cpp
         Source/Resonators/StiffString.cpp
+        Source/Resonators/Dynamic1dWave.cpp
+        Source/UI/ResonatorTypeComponent.cpp
         Source/UI/DisplacementVisualiserComponent.cpp
         Source/UI/ExcitationTypeComponent.cpp
         Source/UI/OutputPositionsComponent.cpp

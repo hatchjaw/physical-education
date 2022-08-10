@@ -13,7 +13,7 @@
 class DisplacementVisualiserComponent : public juce::Component,
                                         public juce::Timer {
 public:
-    DisplacementVisualiserComponent(Resonator &);
+    DisplacementVisualiserComponent(Resonator *&);
 
     ~DisplacementVisualiserComponent() override;
 
@@ -32,9 +32,15 @@ private:
 
     juce::Path generateStatePath();
 
-    Resonator &resonator;
+    Resonator *&resonator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DisplacementVisualiserComponent)
+
+    juce::Path generateStatePathDynamic(std::vector<FType> &state);
+
+    juce::Path generateStatePathStatic(std::vector<FType> &state);
+
+    float gridSpacing{0.f}, scalingFactor{1000.f};
 };
 
 

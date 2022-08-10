@@ -22,6 +22,7 @@ struct Constants {
     };
 
     struct ParameterIDs {
+        static const juce::StringRef RESONATOR_TYPE;
         static const juce::StringRef EXCITATION_TYPE;
         static const juce::StringRef OUTPUT_MODE;
         static const juce::StringRef OUT_POS_1;
@@ -33,6 +34,7 @@ struct Constants {
         static const juce::StringRef DAMPER_LOSS;
     };
 
+    static const juce::StringArray RESONATOR_TYPES;
     static const juce::StringArray EXCITATION_TYPES;
 };
 

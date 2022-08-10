@@ -9,6 +9,7 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
         PhysicalEducationAudioProcessor &p
 ) : AudioProcessorEditor(&p),
     audioProcessor(p),
+    resonatorTypeComponent(audioProcessor.apvts, Constants::ParameterIDs::RESONATOR_TYPE),
     displacementVisualiserComponent(audioProcessor.getResonator()),
     outputModeComponent(audioProcessor.apvts, Constants::ParameterIDs::OUTPUT_MODE),
     outputPositionsComponent(audioProcessor.apvts, Constants::ParameterIDs::OUT_POS_1,
@@ -32,6 +33,12 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
     addAndMakeVisible(outputPositionsComponent);
     // Got to add this after output position component else it can't be clicked.
     addAndMakeVisible(outputModeComponent);
+
+    addAndMakeVisible(resonatorTypeComponent);
+    resonatorTypeComponent.onChange = [this](int value) {
+        damperParamsComponent.setVisible(Constants::RESONATOR_TYPES[value] == "Stiff String");
+    };
+
     addAndMakeVisible(excitationTypeComponent);
     addAndMakeVisible(damperParamsComponent);
 }
@@ -40,7 +47,7 @@ PhysicalEducationAudioProcessorEditor::~PhysicalEducationAudioProcessorEditor() 
 }
 
 void PhysicalEducationAudioProcessorEditor::paint(Graphics &g) {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colour{49, 73, 83});
 }
 
 void PhysicalEducationAudioProcessorEditor::resized() {
@@ -68,9 +75,15 @@ void PhysicalEducationAudioProcessorEditor::resized() {
             Constants::Layout::OUTPUT_POSITIONS_HEIGHT
     );
 
-    excitationTypeComponent.setBounds(0, 0, Constants::Layout::EXCITATION_TYPE_WIDTH,
+    resonatorTypeComponent.setBounds(0, 0,
+                                     Constants::Layout::EXCITATION_TYPE_WIDTH,
+                                     Constants::Layout::EXCITATION_TYPE_HEIGHT);
+
+    excitationTypeComponent.setBounds(resonatorTypeComponent.getRight() + 10, 0,
+                                      Constants::Layout::EXCITATION_TYPE_WIDTH,
                                       Constants::Layout::EXCITATION_TYPE_HEIGHT);
 
-    damperParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5, width,
+    damperParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5,
+                                    width,
                                     Constants::Layout::DAMPER_PARAMS_HEIGHT);
 }

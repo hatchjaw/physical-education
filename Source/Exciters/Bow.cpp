@@ -12,8 +12,9 @@ void Bow::setFriction(FType friction) {
 
 void Bow::setupExcitation() {
     auto p = resonatorParameters.derived;
-    // TODO: these coefficients relate specifically to the stiff string mode so maybe move them
-    //  there and pass here by reference. Or make this a StiffStringBow instead.
+    // TODO: these coefficients relate specifically to the stiff string model so
+    //  maybe move them there and pass here by reference. Or make this a
+    //  StiffStringBow instead.
     coeffs = {
             2 * (1 / p.k + p.sigma0),
             2 * (p.cSq / p.hSq - 1 / p.kSq + 3 * p.kappaSq / p.hSqSq + 2 * p.sigma1 / p.k * p.hSq),

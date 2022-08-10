@@ -25,6 +25,8 @@ public:
      */
     Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse);
 
+    void setLength(FType length);
+
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
     /**
@@ -115,7 +117,16 @@ public:
 
     void updateSmoothedParams();
 
+    FType getGridSpacing() const;
+
+    FType getLength();
+
 protected:
+    /**
+     * Set the size of the state vectors and fill with zeros.
+     */
+    virtual void initialiseState();
+
     /**
      * Convert from a 60 dB decay time to a frequency independent decay.
      * @param t60 decay time
@@ -135,6 +146,8 @@ protected:
      */
     std::pair<FType, FType> t60ToSigma(FType t60_0, FType t60_1, FType omega0 = 100., FType omega1 = 1000.) const;
 
+    virtual void setDerivedParameters() = 0;
+
     /**
      * Compute the model coefficients.
      * NB. sample rate must be set before calling this method.
@@ -146,11 +159,19 @@ protected:
      */
     virtual void computeScheme() = 0;
 
-    const FType L{1.0};
+    /**
+     * Advance the timestep by swapping pointers to state vectors.
+     */
+    virtual void advanceTimestep();
+
     /**
      * Dimensions of the model's grid stencil.
      */
     std::pair<unsigned int, unsigned int> stencilDimensions;
+    /**
+     * Length of the system (m)
+     */
+    FType L{1.0};
     /**
      * Model parameters.
      */
@@ -169,15 +190,6 @@ protected:
 
     bool isInitialised{false};
 private:
-    /**
-     * Set the size of the state vectors and fill with zeros.
-     */
-    void initialiseState();
-
-    /**
-     * Advance the timestep by swapping pointers to state vectors.
-     */
-    void advanceTimestep();
 
     /**
      * Get the current displacement of a single output position.

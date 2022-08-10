@@ -23,7 +23,7 @@ public:
     FType getOutputScalar() override;
 
 private:
-    void setDerivedParameters();
+    void setDerivedParameters() override;
 
     void computeCoefficients() override;
 

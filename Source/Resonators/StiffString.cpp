@@ -68,23 +68,23 @@ void StiffString::computeCoefficients() {
     auto lambdaSq = pow(p->lambda, 2);
     p->mu = (p->kappa * p->k) / p->hSq;
     auto muSq = pow(p->mu, 2);
-    auto nu = (2 * p->sigma1 * p->k) / p->hSq;
+    auto S = (2 * p->sigma1 * p->k) / p->hSq;
 
     p->lambdaSqPlus4MuSq = lambdaSq + 4 * muSq;
 
     coeffs = {
             // u_l^n
-            2 - (2 * lambdaSq) - (6 * muSq) - (2 * nu),
+            2 - (2 * lambdaSq) - (6 * muSq) - (2 * S),
             // u_l^n, boundaries
-            2 - (2 * lambdaSq) - (5 * muSq) - (2 * nu),
+            2 - (2 * lambdaSq) - (5 * muSq) - (2 * S),
             // u_l^{n-1}
-            (p->sigma0 * p->k) - 1 + (2 * nu),
+            (p->sigma0 * p->k) - 1 + (2 * S),
             // u_{l±2}^n
             -muSq,
             // u_{l±1}^n
-            lambdaSq + (4 * muSq) + nu,
+            lambdaSq + (4 * muSq) + S,
             // u_{l±1}^{n-1}
-            -nu,
+            -S,
     };
 
     p->rawCoeffs = coeffs;

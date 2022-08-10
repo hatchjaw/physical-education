@@ -27,6 +27,7 @@ void SpringDamper::setupInteraction() {
     auto p = resonatorParameters.derived;
 
     // TODO: reinstate rho*A and adjust parameter ranges.
+    //  NB, not straightforward; needs more rigorous testing.
     // On paper one would factor k^2 out of the force term and have it here,
     // but since it's a component of a and b in applyInteraction(), just make use
     // of it there.
@@ -50,6 +51,11 @@ void SpringDamper::applyInteraction(std::vector<FType *> &state) {
     auto alpha = modf(posIndex, &posIndex);
     auto interactionPos = static_cast<int>(posIndex);
 
+    // Got to update smoothed parameters before performing this check.
+    if (coeffs[0] == 0 && coeffs[1] == 0 && coeffs[2] == 0) {
+        return;
+    }
+
     // Get a stencil's worth of interpolated state at the damper position.
     std::vector<FType> eta = {
             Utils::interpolate(state[1], interactionPos - 2, alpha),
@@ -72,6 +78,7 @@ void SpringDamper::applyInteraction(std::vector<FType *> &state) {
     // Compute eta^{n+1}, the next displacement at the interaction position.
     // Plug a and b into the modified update equation. It's the stiff string
     // with a added to the divisor, and b added to the coefficient for u_p^{n-1}.
+    // TODO: generalise this for other FDS.
     auto etaNext = (
                            p.rawCoeffs[0] * eta[2] +
                            (p.rawCoeffs[2] - b) * etaPrev[1] +

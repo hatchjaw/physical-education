@@ -78,14 +78,15 @@ public:
      */
     std::vector<double> &getModelState() noexcept;
 
-    Resonator &getResonator();
+    Resonator *&getResonator();
 
 private:
     juce::Synthesiser physEdSynth;
     /**
-     * TODO: find a better way of checking the current exciter. Compare class
-     *  names or something.
+     * TODO: find a better way of checking the current resonator/exciter.
+     *  Compare class names or something.
      */
+    juce::String currentResonator;
     juce::String currentExciter;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParams();

@@ -12,6 +12,7 @@
 #include "UI/OutputPositionsComponent.h"
 #include "UI/ExcitationTypeComponent.h"
 #include "UI/DamperParamsComponent.h"
+#include "UI/ResonatorTypeComponent.h"
 
 class PhysicalEducationAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -31,6 +32,7 @@ private:
 
     // UI components.
 //    juce::TextButton resetButton{"Reset"};
+    ResonatorTypeComponent resonatorTypeComponent;
     DisplacementVisualiserComponent displacementVisualiserComponent;
     OutputModeComponent outputModeComponent;
     OutputPositionsComponent outputPositionsComponent;

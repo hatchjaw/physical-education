@@ -79,7 +79,7 @@ FType Resonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     auto alpha = modf(outputPositions[outputPositionIndex], &readPos);
 
     // Get the displacement, interpolated around the read position.
-    auto displacement = Utils::interpolate(u[1], static_cast<int>(readPos), alpha);
+    auto displacement = Utils::interpolate(u[0], static_cast<int>(readPos), alpha);
 
     // Save it to the displacement buffer.
     uOut[0][outputPositionIndex] = displacement;
@@ -122,11 +122,6 @@ FType Resonator::t60ToSigma0(FType t60) {
 }
 
 FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega) {
-//    zeta1 = (-gamma^2+sqrt(gamma^4+4*K^2*(2*pi*loss(1,1))^2))/(2*K^2);
-//    zeta2 = (-gamma^2+sqrt(gamma^4+4*K^2*(2*pi*loss(2,1))^2))/(2*K^2);
-//    sig0 = 6*log(10)*(-zeta2/loss(1,2)+zeta1/loss(2,2))/(zeta1-zeta2);
-//    sig1 = 6*log(10)*(1/loss(1,2)-1/loss(2,2))/(zeta1-zeta2);
-
     auto p = parameters.derived;
     auto z1 = (-p.cSq + sqrt(pow(p.c, 4) + 4 * p.kappaSq * pow(2 * M_PI * omega, 2))) / (2 * p.kappaSq);
 
@@ -144,16 +139,16 @@ FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega) {
 std::pair<FType, FType> Resonator::t60ToSigma(FType t60_0, FType t60_1, FType omega0, FType omega1) const {
     auto p = parameters.derived;
     auto cSqSq = pow(p.cSq, 2);
-    auto sixLogTen = 6 * log(10);
+    auto sixLogTen = 6. * log(10.);
     auto sigmas = std::pair<FType, FType>{};
-    auto twoPI = 2 * M_PI;
+    auto twoPI = 2. * M_PI;
 
     // If this isn't a stiff resonator, just calculate damping based on
     // wavespeed.
     if (p.kappa == 0) {
         auto zeta = pow(twoPI * omega1, 2) / (p.cSq);
 
-        sigmas.first = sixLogTen / t60_1;
+        sigmas.first = sixLogTen / t60_0;
         sigmas.second = (sixLogTen * (1 / t60_1 - 1 / t60_0)) / zeta;
     } else {
         auto zeta1 = 0., zeta2 = 0.;
@@ -181,7 +176,7 @@ void Resonator::initialiseState() {
 
 std::vector<FType> &Resonator::getState() {
     jassert(isInitialised);
-    return uStates[1];
+    return uStates[0];
 }
 
 ModelParameters &Resonator::getParameters() {
@@ -235,4 +230,16 @@ void Resonator::updateSmoothedParams() {
     damper.sigmaP.getNext();
     damper.omega0.getNext();
     damper.omega1.getNext();
+}
+
+FType Resonator::getGridSpacing() const {
+    return parameters.derived.h;
+}
+
+void Resonator::setLength(FType length) {
+    L = length;
+}
+
+FType Resonator::getLength() {
+    return L;
 }

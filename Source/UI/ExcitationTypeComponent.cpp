@@ -29,7 +29,7 @@ ExcitationTypeComponent::~ExcitationTypeComponent() {}
 void ExcitationTypeComponent::paint(juce::Graphics &g) {}
 
 void ExcitationTypeComponent::resized() {
-    excitationTypeLabel.setBounds(0, 0, static_cast<int>(getWidth() * .3), getHeight());
+    excitationTypeLabel.setBounds(0, 0, static_cast<int>(getWidth() * .2), getHeight());
     excitationTypeSelector.setBounds(excitationTypeLabel.getRight(), 0, static_cast<int>(getWidth() * .7),
                                      getHeight());
 }

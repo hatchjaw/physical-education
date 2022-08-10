@@ -38,7 +38,7 @@ struct ModelParameters {
          */
         FType I{0.0};
         /**
-         * Number of grid points
+         * Number of grid **intervals**, i.e. number of spatial gridpoints = N+1
          */
         unsigned int N{0};
         /**
