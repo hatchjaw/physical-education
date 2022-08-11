@@ -40,7 +40,8 @@ private:
 
     juce::Path generateStatePathStatic(std::vector<FType> &state);
 
-    float gridSpacing{0.f}, scalingFactor{1000.f};
+    // TODO: parameterise the scaling factor.
+    float gridSpacing{0.f}, scalingFactor{250.f};
 };
 
 

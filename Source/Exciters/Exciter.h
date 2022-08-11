@@ -18,7 +18,7 @@ public:
 
     virtual void setupExcitation() = 0;
 
-    virtual void startExcitation (
+    virtual void startExcitation(
             float excitationPosition,
             float excitationForce,
             float excitationVelocity
@@ -45,6 +45,8 @@ protected:
     ModelParameters &resonatorParameters;
 
     friend class Resonator;
+
+    friend class DynamicResonator;
 };
 
 

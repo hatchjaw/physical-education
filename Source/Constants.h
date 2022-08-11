@@ -32,6 +32,7 @@ struct Constants {
         static const juce::StringRef DAMPER_STIFFNESS;
         static const juce::StringRef DAMPER_NONLINEARITY;
         static const juce::StringRef DAMPER_LOSS;
+        static const juce::StringRef TENSION;
     };
 
     static const juce::StringArray RESONATOR_TYPES;

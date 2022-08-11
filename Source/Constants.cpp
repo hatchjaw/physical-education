@@ -21,6 +21,7 @@ const juce::StringRef Constants::ParameterIDs::DAMPER_POS = "DAMPER_POS";
 const juce::StringRef Constants::ParameterIDs::DAMPER_STIFFNESS = "DAMPER_STIFFNESS";
 const juce::StringRef Constants::ParameterIDs::DAMPER_NONLINEARITY = "DAMPER_OMEGA1";
 const juce::StringRef Constants::ParameterIDs::DAMPER_LOSS = "DAMPER_LOSS";
+const juce::StringRef Constants::ParameterIDs::TENSION = "TENSION";
 
 
 const juce::StringArray Constants::RESONATOR_TYPES = {

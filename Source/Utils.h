@@ -50,6 +50,14 @@ public:
         return input;
     }
 
+    /**
+     * NB, doesn't check whether indices are in-bounds.
+     *
+     * @param u Array to read from.
+     * @param readPos Integral component of the read position.
+     * @param alpha Fractional component of the read position.
+     * @return
+     */
     static FType interpolate(const FType *u, int readPos, FType alpha) {
         return u[readPos - 1] * (-alpha * (alpha - 1) * (alpha - 2) / 6.0) +
                u[readPos] * ((alpha - 1) * (alpha + 1) * (alpha - 2) / 2.0) +

@@ -19,7 +19,9 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
                           Constants::ParameterIDs::DAMPER_POS,
                           Constants::ParameterIDs::DAMPER_STIFFNESS,
                           Constants::ParameterIDs::DAMPER_NONLINEARITY,
-                          Constants::ParameterIDs::DAMPER_LOSS) {
+                          Constants::ParameterIDs::DAMPER_LOSS),
+    wave1dParamsComponent(audioProcessor.apvts,
+                          Constants::ParameterIDs::TENSION) {
 
     setSize(800, 600);
 
@@ -36,11 +38,15 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
 
     addAndMakeVisible(resonatorTypeComponent);
     resonatorTypeComponent.onChange = [this](int value) {
-        damperParamsComponent.setVisible(Constants::RESONATOR_TYPES[value] == "Stiff String");
+        auto resType = Constants::RESONATOR_TYPES[value];
+        damperParamsComponent.setVisible(resType == "Stiff String");
+        wave1dParamsComponent.setVisible(resType == "Dynamic 1D Wave");
     };
 
     addAndMakeVisible(excitationTypeComponent);
-    addAndMakeVisible(damperParamsComponent);
+
+    addChildComponent(damperParamsComponent);
+    addChildComponent(wave1dParamsComponent);
 }
 
 PhysicalEducationAudioProcessorEditor::~PhysicalEducationAudioProcessorEditor() {
@@ -86,4 +92,7 @@ void PhysicalEducationAudioProcessorEditor::resized() {
     damperParamsComponent.setBounds(0, excitationTypeComponent.getBottom() + 5,
                                     width,
                                     Constants::Layout::DAMPER_PARAMS_HEIGHT);
+
+    wave1dParamsComponent.setBounds(damperParamsComponent.getX(), damperParamsComponent.getY(),
+                                    damperParamsComponent.getWidth(), damperParamsComponent.getHeight());
 }

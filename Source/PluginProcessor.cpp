@@ -172,6 +172,8 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     auto damperNonlinearity = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_NONLINEARITY)->load();
     auto damperLoss = apvts.getRawParameterValue(Constants::ParameterIDs::DAMPER_LOSS)->load();
 
+    auto tension = apvts.getRawParameterValue(Constants::ParameterIDs::TENSION)->load();
+
     // Update parameters
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
         if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
@@ -200,6 +202,10 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
             resonator->setOutputMode(outputMode);
             resonator->setDamperParameters(damperPos, damperStiffness, damperNonlinearity,
                                            damperLoss);
+
+            if (auto dynamicResonator = dynamic_cast<DynamicResonator *>(resonator)) {
+                dynamicResonator->setTension(tension);
+            }
 
             // Exciter change.
             if (excitationType != currentExciter) {
@@ -336,6 +342,13 @@ PhysicalEducationAudioProcessor::createParams() {
             "Damper Loss",
             juce::NormalisableRange<float>(0.f, 200.f, .01f),
             0.f
+    ));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            Constants::ParameterIDs::TENSION,
+            "Tension",
+            juce::NormalisableRange<float>(50.f, 5000.f, .1f),
+            1000.f
     ));
 
     return {params.begin(), params.end()};

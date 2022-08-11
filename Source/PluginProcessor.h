@@ -86,8 +86,8 @@ private:
      * TODO: find a better way of checking the current resonator/exciter.
      *  Compare class names or something.
      */
-    juce::String currentResonator;
-    juce::String currentExciter;
+    juce::String currentResonator{""};
+    juce::String currentExciter{""};
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //==============================================================================

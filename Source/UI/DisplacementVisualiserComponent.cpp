@@ -42,12 +42,12 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
         // This isn't pretty, but it's one way of avoiding drawing an out-of-
         // date w, thus giving the appearance that displacement correction isn't
         // working.
-        auto state = dynamic1dWave->getState();
-        std::vector<FType> u(state.size());
-        std::copy(state.begin(), state.end(), u.begin());
-        state = dynamic1dWave->getStaticState();
-        std::vector<FType> w(state.size());
-        std::copy(state.begin(), state.end(), w.begin());
+        auto uState = dynamic1dWave->getState();
+        std::vector<FType> u(uState.size());
+        std::copy(uState.begin(), uState.end(), u.begin());
+        auto wState = dynamic1dWave->getStaticState();
+        std::vector<FType> w(wState.size());
+        std::copy(wState.begin(), wState.end(), w.begin());
 
         auto path = generateStatePathDynamic(u);
         g.strokePath(path, PathStrokeType(2.0f));

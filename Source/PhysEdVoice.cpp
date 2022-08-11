@@ -16,8 +16,9 @@ bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
 }
 
 void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numOutputChannels) {
-    this->resonator->setDecayTimes(12.5, 1.3323);
-    if (auto model = dynamic_cast<StiffString *>(this->resonator)) {
+    resonator->setDecayTimes(12.5, 1.3323);
+
+    if (auto model = dynamic_cast<StiffString *>(resonator)) {
         model->setDensity(7850.);
         model->setRadius(.0005);
         model->setTension(100.);
@@ -25,11 +26,12 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
             exciter->setFriction(100.);
         }
-    } else if (auto model = dynamic_cast<Dynamic1dWave *>(this->resonator)) {
-        model->setLength(.93);
+    } else if (auto model = dynamic_cast<Dynamic1dWave *>(resonator)) {
+        model->setDecayTimes(18.5, 18);
+        model->setLength(1.05);
         model->setDensity(1000.);
         model->setRadius(9e-4);
-        model->setTension(2500.);
+        model->setTension(1000.);
         if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
             exciter->setFriction(100.);
         }
@@ -65,12 +67,12 @@ void PhysEdVoice::renderNextBlock(
 ) {
     jassert(this->isPrepared);
 
-    if (!this->isVoiceActive()) {
-        while (--numSamples >= 0) {
-            resonator->updateSmoothedParams();
-        }
-        return;
-    }
+//    if (!this->isVoiceActive()) {
+//        while (--numSamples >= 0) {
+//            resonator->updateSmoothedParams();
+//        }
+//        return;
+//    }
 
     // MIDI messages can occur at any point during a buffer,
     // so prevent discontinuities by writing to a temp buffer.

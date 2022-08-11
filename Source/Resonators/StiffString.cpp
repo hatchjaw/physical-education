@@ -20,7 +20,7 @@ void StiffString::setRadius(FType radius) {
 }
 
 void StiffString::setTension(FType tension) {
-    parameters.T = tension;
+    parameters.T.set(tension, true);
     setDerivedParameters();
 }
 
@@ -37,7 +37,7 @@ void StiffString::setDerivedParameters() {
 
         auto rhoA = parameters.rho * p->A;
         if (rhoA > 0.0) {
-            p->cSq = parameters.T / rhoA;
+            p->cSq = parameters.T.getCurrent() / rhoA;
             p->c = sqrt(p->cSq);
             p->kappaSq = parameters.E * p->I / rhoA;
             p->kappa = sqrt(p->kappaSq);

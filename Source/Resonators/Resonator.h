@@ -38,7 +38,7 @@ public:
      */
     void setOutputPositions(std::vector<float> outputPositionsToUse);
 
-    void setOutputPosition(unsigned long positionIndex, FType normalisedPosition);
+     void setOutputPosition(unsigned long positionIndex, FType normalisedPosition);
 
     /**
      * Set the output mode; use either DISPLACEMENT or VELOCITY.
@@ -119,7 +119,7 @@ public:
 
     FType getGridSpacing() const;
 
-    FType getLength();
+    FType getLength() const;
 
 protected:
     /**
@@ -188,30 +188,29 @@ protected:
 
     OutputMode outputMode{DISPLACEMENT};
 
+    /**
+     * Positions from which to take displacement for output.
+     */
+    std::vector<float> normalisedOutputPositions;
+
     bool isInitialised{false};
-private:
+
+    Exciter *exciter;
+
+    SpringDamper damper;
 
     /**
      * Get the current displacement of a single output position.
      * @return The displacement of the output position.
      */
-    FType getOutputAtPosition(unsigned long outputPositionIndex);
+    virtual FType getOutputAtPosition(unsigned long outputPositionIndex);
 
-    /**
-     * Positions from which to take displacement for output.
-     */
-    std::vector<float> normalisedOutputPositions;
-    std::vector<float> outputPositions;
     /**
      * Buffers to store the most recent displacements for each output position.
      * To be used when using velocity for output.
      */
     std::vector<FType *> uOut;
     std::vector<std::vector<FType>> uOutStates;
-
-    Exciter *exciter;
-
-    SpringDamper damper;
 };
 
 

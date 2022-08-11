@@ -6,6 +6,7 @@
 #define PHYSICAL_EDUCATION_MODELPARAMETERS_H
 
 #include "../Utils.h"
+#include "SmoothedParameter.h"
 
 struct ModelParameters {
     struct DerivedParameters {
@@ -82,7 +83,7 @@ struct ModelParameters {
     /**
      * Tension (N)
      */
-    FType T{0.0};
+    SmoothedParameter<FType> T{0.0, 1e-4};
     /**
      * Young's modulus (Pa)
      */

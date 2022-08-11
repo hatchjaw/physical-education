@@ -21,10 +21,8 @@ void Resonator::setDecayTimes(FType freqIndependent, FType freqDependent) {
 void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
     jassert(parameters.derived.N > 0);
 
-    if (outputPositionsToUse.size() != outputPositions.size()) {
+    if (outputPositionsToUse.size() != normalisedOutputPositions.size()) {
         Utils::setupVectorPointers(uOut, uOutStates, 3, outputPositionsToUse.size());
-
-        outputPositions.resize(outputPositionsToUse.size());
         normalisedOutputPositions.resize(outputPositionsToUse.size());
     }
 
@@ -37,8 +35,6 @@ void Resonator::setOutputPositions(std::vector<float> outputPositionsToUse) {
 void Resonator::setOutputPosition(unsigned long positionIndex, FType normalisedPosition) {
     auto position = Utils::clamp(normalisedPosition, 0.f, 1.f);
     normalisedOutputPositions[positionIndex] = position;
-    position *= static_cast<float>(parameters.derived.N);
-    outputPositions[positionIndex] = position;
 }
 
 void Resonator::setOutputMode(Resonator::OutputMode mode) {
@@ -72,11 +68,14 @@ void Resonator::damp() {
 
 FType Resonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     jassert(isInitialised);
-    jassert(outputPositionIndex < outputPositions.size());
+    jassert(outputPositionIndex < normalisedOutputPositions.size());
+
+    auto N = static_cast<float>(parameters.derived.N);
+    auto position = Utils::clamp(normalisedOutputPositions[outputPositionIndex] * N, 1.f, N - 2.f);
 
     // Separate the integer and fractional parts of the read position.
     float readPos;
-    auto alpha = modf(outputPositions[outputPositionIndex], &readPos);
+    auto alpha = modf(position, &readPos);
 
     // Get the displacement, interpolated around the read position.
     auto displacement = Utils::interpolate(u[0], static_cast<int>(readPos), alpha);
@@ -240,6 +239,6 @@ void Resonator::setLength(FType length) {
     L = length;
 }
 
-FType Resonator::getLength() {
+FType Resonator::getLength() const {
     return L;
 }
