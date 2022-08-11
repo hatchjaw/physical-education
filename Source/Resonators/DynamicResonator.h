@@ -30,6 +30,8 @@ protected:
 
     virtual void doDisplacementCorrection() = 0;
 
+    virtual void adjustGridDimensions() = 0;
+
     FType getOutputAtPosition(unsigned long outputPositionIndex) override;
 
     /**

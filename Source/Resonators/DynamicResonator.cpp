@@ -48,7 +48,9 @@ void DynamicResonator::initialiseModel(FType sampleRate) {
 
 void DynamicResonator::updateState() {
     jassert(isInitialised);
+    adjustGridDimensions();
     computeScheme();
+    doDisplacementCorrection();
     exciter->applyExcitation(u);
     advanceTimestep();
 }

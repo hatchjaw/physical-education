@@ -28,6 +28,8 @@ protected:
     void computeScheme() override;
 
     void doDisplacementCorrection() override;
+
+    void adjustGridDimensions() override;
 };
 
 

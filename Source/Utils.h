@@ -112,12 +112,6 @@ public:
         }
         vectorOfPointers[0] = temp;
     }
-
-    static float randomFloat(float min, float max) {
-        static std::default_random_engine rng;
-        std::uniform_real_distribution<float> dist(min, max);
-        return dist(rng);
-    }
 };
 
 #endif //PHYSICAL_EDUCATION_UTILS_H
