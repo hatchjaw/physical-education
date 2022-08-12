@@ -38,9 +38,9 @@ PhysicalEducationAudioProcessorEditor::PhysicalEducationAudioProcessorEditor(
 
     addAndMakeVisible(resonatorTypeComponent);
     resonatorTypeComponent.onChange = [this](int value) {
-        auto resType = Constants::RESONATOR_TYPES[value];
-        damperParamsComponent.setVisible(resType == "Stiff String");
-        wave1dParamsComponent.setVisible(resType == "Dynamic 1D Wave");
+        auto resType = static_cast<ResonatorType>(value);
+        damperParamsComponent.setVisible(resType == ResonatorType::StiffString);
+        wave1dParamsComponent.setVisible(resType == ResonatorType::Dynamic1dWave);
     };
 
     addAndMakeVisible(excitationTypeComponent);

@@ -7,7 +7,7 @@
 void RaisedCosine::startExcitation(float excitationPosition,
                                    float excitationForce,
                                    float excitationVelocity) {
-    Exciter::startExcitation(excitationPosition, excitationForce, excitationVelocity);
+    Exciter1D::startExcitation(excitationPosition, excitationForce, excitationVelocity);
     position.set(excitationPosition, true);
 
     // Keep the width sensible relative to the total number of grid-points, and

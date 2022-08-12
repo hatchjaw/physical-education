@@ -6,36 +6,37 @@
 #include "StiffString.h"
 
 StiffString::StiffString(Exciter *exciterToUse) :
-        Resonator(std::make_pair(5, 3), exciterToUse) {
+        Resonator({5, 3}, exciterToUse) {
 }
 
 void StiffString::setDensity(FType density) {
     parameters.rho = density;
-    setDerivedParameters();
+    computeDerivedParameters();
 }
 
 void StiffString::setRadius(FType radius) {
     parameters.r = radius;
-    setDerivedParameters();
+    computeDerivedParameters();
 }
 
 void StiffString::setTension(FType tension) {
-    parameters.T.set(tension, true);
-    setDerivedParameters();
+    parameters.T = tension;
+    computeDerivedParameters();
 }
 
 void StiffString::setYoungsModulus(FType youngsModulus) {
     parameters.E = youngsModulus;
-    setDerivedParameters();
+    computeDerivedParameters();
 }
 
-void StiffString::setDerivedParameters() {
-    if (parameters.r > 0.0) {
+void StiffString::computeDerivedParameters() {
+    if (parameters.r.getCurrent() > 0.0) {
         auto p = &parameters.derived;
-        p->A = M_PI * pow(parameters.r, 2);
-        p->I = 0.25 * M_PI * pow(parameters.r, 4);
+        auto r = parameters.r.getNext();
+        p->A = M_PI * pow(r, 2);
+        p->I = 0.25 * M_PI * pow(r, 4);
 
-        auto rhoA = parameters.rho * p->A;
+        auto rhoA = parameters.rho.getNext() * p->A;
         if (rhoA > 0.0) {
             p->cSq = parameters.T.getCurrent() / rhoA;
             p->c = sqrt(p->cSq);

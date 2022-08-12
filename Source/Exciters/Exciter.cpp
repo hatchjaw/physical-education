@@ -6,15 +6,6 @@
 
 Exciter::Exciter(ModelParameters &parameters) : resonatorParameters(parameters) {}
 
-void Exciter::startExcitation(float excitationPosition,
-                              float excitationForce,
-                              float excitationVelocity) {
-    position.set(excitationPosition);
-    force = excitationForce;
-    velocity = excitationVelocity;
-    isExciting = true;
-}
-
 void Exciter::stopExcitation() {
     force = 0.0;
     velocity = 0.0;

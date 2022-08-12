@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Constants.h"
 #include "Utils.h"
 #include "Resonators/Resonator.h"
 
@@ -86,8 +87,8 @@ private:
      * TODO: find a better way of checking the current resonator/exciter.
      *  Compare class names or something.
      */
-    juce::String currentResonator{""};
-    juce::String currentExciter{""};
+    ResonatorType currentResonator;
+    ExcitationType currentExciter;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     //==============================================================================

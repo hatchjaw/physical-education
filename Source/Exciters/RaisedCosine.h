@@ -6,13 +6,12 @@
 #define PHYSICAL_EDUCATION_RAISEDCOSINE_H
 
 
-#include "Exciter.h"
+#include "Exciter1D.h"
 #include "../Resonators/Resonator.h"
 
-class RaisedCosine : public Exciter {
+class RaisedCosine : public Exciter1D {
+    using Exciter1D::Exciter1D;
 public:
-    using Exciter::Exciter;
-
     void setupExcitation() override {}
 
     void startExcitation(float excitationPosition,

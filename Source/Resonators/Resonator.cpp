@@ -5,6 +5,12 @@
 #include <cmath>
 #include <utility>
 #include "Resonator.h"
+#include "../Exciters/Exciter2D.h"
+#include "../Exciters/Exciter1D.h"
+
+
+Resonator::Resonator(Exciter *exciterToUse) : exciter(exciterToUse), damper(parameters) {
+}
 
 Resonator::Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse) :
         stencilDimensions(std::move(stencil)),
@@ -59,7 +65,11 @@ void Resonator::initialiseModel(FType sampleRate) {
 void Resonator::excite(float position, float force, float velocity) {
     jassert(isInitialised);
 
-    exciter->startExcitation(position, force, velocity);
+    if (auto ex = dynamic_cast<Exciter1D *>(exciter)) {
+        ex->startExcitation(position, force, velocity);
+    } else if (auto ex = dynamic_cast<Exciter2D *>(exciter)) {
+        ex->startExcitation({position, position}, force, velocity);
+    }
 }
 
 void Resonator::damp() {
@@ -137,7 +147,6 @@ FType Resonator::t60ToSigma1(FType t60_0, FType t60_1, FType omega) {
 
 std::pair<FType, FType> Resonator::t60ToSigma(FType t60_0, FType t60_1, FType omega0, FType omega1) const {
     auto p = parameters.derived;
-    auto cSqSq = pow(p.cSq, 2);
     auto sixLogTen = 6. * log(10.);
     auto sigmas = std::pair<FType, FType>{};
     auto twoPI = 2. * M_PI;
@@ -156,6 +165,7 @@ std::pair<FType, FType> Resonator::t60ToSigma(FType t60_0, FType t60_1, FType om
             zeta1 = twoPI * omega0 / p.kappa;
             zeta2 = twoPI * omega1 / p.kappa;
         } else {
+            auto cSqSq = pow(p.cSq, 2);
             // Otherwise do the full thing.
             zeta1 = (-p.cSq + sqrt(cSqSq + 4 * p.kappaSq * pow(twoPI * omega0, 2))) / (2 * p.kappaSq);
             zeta2 = (-p.cSq + sqrt(cSqSq + 4 * p.kappaSq * pow(twoPI * omega1, 2))) / (2 * p.kappaSq);
@@ -220,11 +230,22 @@ FType Resonator::getDamperPosition() {
 }
 
 FType Resonator::getExcitationPosition() {
-    return exciter->position.getCurrent();
+    if (auto ex = dynamic_cast<Exciter1D *>(exciter)) {
+        return ex->position.getCurrent();
+    } else if (auto ex = dynamic_cast<Exciter2D *>(exciter)) {
+        // TODO: sort this out
+        return ex->position.first.getCurrent();
+    }
 }
 
 void Resonator::updateSmoothedParams() {
-    exciter->position.getNext();
+    if (auto ex = dynamic_cast<Exciter1D *>(exciter)) {
+        ex->position.getNext();
+    } else if (auto ex = dynamic_cast<Exciter2D *>(exciter)) {
+        ex->position.first.getNext();
+        ex->position.second.getNext();
+    }
+
     damper.position.getNext();
     damper.sigmaP.getNext();
     damper.omega0.getNext();

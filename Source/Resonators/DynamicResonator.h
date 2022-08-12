@@ -11,7 +11,9 @@
 class DynamicResonator : public Resonator {
     using Resonator::Resonator;
 public:
-    /**
+//    DynamicResonator();
+
+/**
      * Get a reference to the static part of the system.
      * @return
      */
@@ -35,7 +37,7 @@ protected:
     FType getOutputAtPosition(unsigned long outputPositionIndex) override;
 
     /**
-     * State pointers for the static part of the system.
+     * State vectors for the static part of the system.
      */
     std::vector<FType *> w;
     std::vector<std::vector<FType>> wStates;
@@ -48,7 +50,7 @@ protected:
     /**
      * Displacement correction parameters
      */
-    FType sigmaC{1.}, sigmaCkp{0.}, sigmaCkm{0.}, epsilon{0.}, restoringForce{0.};
+    FType sigmaC{1.5}, sigmaCkp{0.}, sigmaCkm{0.}, epsilon{0.}, restoringForce{0.};
 };
 
 

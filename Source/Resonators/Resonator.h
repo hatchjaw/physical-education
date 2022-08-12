@@ -19,13 +19,15 @@ public:
         VELOCITY,
     };
 
+    Resonator(Exciter *exciterToUse);
+
     /**
      * Resonator constructor
      * @param stencil
      */
     Resonator(std::pair<unsigned int, unsigned int> stencil, Exciter *exciterToUse);
 
-    void setLength(FType length);
+    virtual void setLength(FType length);
 
     void setDecayTimes(FType freqIndependent, FType freqDependent);
 
@@ -38,7 +40,7 @@ public:
      */
     void setOutputPositions(std::vector<float> outputPositionsToUse);
 
-     void setOutputPosition(unsigned long positionIndex, FType normalisedPosition);
+    void setOutputPosition(unsigned long positionIndex, FType normalisedPosition);
 
     /**
      * Set the output mode; use either DISPLACEMENT or VELOCITY.
@@ -146,7 +148,7 @@ protected:
      */
     std::pair<FType, FType> t60ToSigma(FType t60_0, FType t60_1, FType omega0 = 100., FType omega1 = 1000.) const;
 
-    virtual void setDerivedParameters() = 0;
+    virtual void computeDerivedParameters() = 0;
 
     /**
      * Compute the model coefficients.

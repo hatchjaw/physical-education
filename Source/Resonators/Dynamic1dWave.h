@@ -21,7 +21,7 @@ public:
     void setRadius(FType radius);
 
 protected:
-    void setDerivedParameters() override;
+    void computeDerivedParameters() override;
 
     void computeCoefficients() override;
 

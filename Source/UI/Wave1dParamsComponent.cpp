@@ -6,6 +6,7 @@
 
 Wave1dParamsComponent::Wave1dParamsComponent(AudioProcessorValueTreeState &apvts, const String &tensionID) {
     tensionSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    tensionSlider.setTextValueSuffix(" N");
     addAndMakeVisible(tensionSlider);
     tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts,
@@ -30,6 +31,6 @@ void Wave1dParamsComponent::resized() {
     auto h = static_cast<int>(getHeight() * .5);
     auto halfH = h / 2;
 
-    tensionLabel.setBounds(0, 0, twiceW, halfH);
+    tensionLabel.setBounds(0, y, twiceW, halfH);
     tensionSlider.setBounds(0, tensionLabel.getBottom(), twiceW, halfH);
 }

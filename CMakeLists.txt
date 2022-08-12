@@ -78,12 +78,17 @@ target_sources(PhysicalEducation
         Source/PhysEdVoice.cpp
         Source/Dampers/SpringDamper.cpp
         Source/Exciters/Exciter.cpp
+        Source/Exciters/Exciter1D.cpp
+        Source/Exciters/Exciter2D.cpp
         Source/Exciters/RaisedCosine.cpp
+        Source/Exciters/RaisedCosine2D.cpp
         Source/Exciters/Bow.cpp
         Source/Resonators/Resonator.cpp
         Source/Resonators/DynamicResonator.cpp
         Source/Resonators/StiffString.cpp
         Source/Resonators/Dynamic1dWave.cpp
+        Source/Resonators/DynamicResonator2D.cpp
+        Source/Resonators/Dynamic2dWave.cpp
         Source/UI/ResonatorTypeComponent.cpp
         Source/UI/DisplacementVisualiserComponent.cpp
         Source/UI/ExcitationTypeComponent.cpp

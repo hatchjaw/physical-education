@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "Exciters/Bow.h"
 #include "Resonators/Dynamic1dWave.h"
+#include "Resonators/Dynamic2dWave.h"
 
 PhysEdVoice::~PhysEdVoice() = default;
 
@@ -23,33 +24,46 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         model->setRadius(.0005);
         model->setTension(100.);
         model->setYoungsModulus(2e11);
-        if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
-            exciter->setFriction(100.);
-        }
     } else if (auto model = dynamic_cast<Dynamic1dWave *>(resonator)) {
         model->setDecayTimes(18.5, 18);
         model->setLength(1.05);
         model->setDensity(1000.);
         model->setRadius(9e-4);
         model->setTension(1000.);
-        if (auto exciter = dynamic_cast<Bow *>(model->getExciter())) {
-            exciter->setFriction(100.);
-        }
+    } else if (auto model = dynamic_cast<Dynamic2dWave *>(resonator)) {
+        model->setDimensions({.95, 1.05});
+        model->setTension(5e3, true);
+        model->setDensity(100, true);
+        model->setThickness(5e-5, true);
     }
 
-    this->resonator->initialiseModel(static_cast<float>(sampleRate));
-    this->resonator->setOutputPositions(std::vector<float>{.35f, .9f});
-    this->resonator->setOutputMode(Resonator::OutputMode::VELOCITY);
-    this->isPrepared = true;
+    if (auto exciter = dynamic_cast<Bow *>(resonator->getExciter())) {
+        exciter->setFriction(100.);
+    }
+
+    resonator->initialiseModel(static_cast<float>(sampleRate));
+
+    if (auto r = dynamic_cast<DynamicResonator2D *>(resonator)) {
+        r->setOutputPositions({
+                                      {.15, .15},
+                                      {.6,  .6}
+                              });
+    } else {
+        resonator->setOutputPositions({.35f, .9f});
+    }
+
+    resonator->setOutputMode(Resonator::OutputMode::VELOCITY);
+
+    isPrepared = true;
 }
 
 void PhysEdVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound *sound,
                             int currentPitchWheelPosition) {
-    this->resonator->excite(static_cast<float>(midiNoteNumber) / 127.f, velocity, velocity);
+    resonator->excite(static_cast<float>(midiNoteNumber) / 127.f, velocity, velocity);
 }
 
 void PhysEdVoice::stopNote(float velocity, bool allowTailOff) {
-    this->resonator->damp();
+    resonator->damp();
 }
 
 void PhysEdVoice::pitchWheelMoved(int newPitchWheelValue) {
@@ -77,8 +91,8 @@ void PhysEdVoice::renderNextBlock(
     // MIDI messages can occur at any point during a buffer,
     // so prevent discontinuities by writing to a temp buffer.
     auto numChannels = outputBuffer.getNumChannels();
-    this->buffer.setSize(numChannels, numSamples, false, false, true);
-    this->buffer.clear();
+    buffer.setSize(numChannels, numSamples, false, false, true);
+    buffer.clear();
 
     auto originalNumSamples = numSamples;
     auto originalStartSample = startSample;
@@ -89,9 +103,9 @@ void PhysEdVoice::renderNextBlock(
 
         auto samples = resonator->getOutput(numChannels);
 
-        for (auto i = (int) this->buffer.getNumChannels(); --i >= 0;) {
+        for (auto i = (int) buffer.getNumChannels(); --i >= 0;) {
             auto sample = Utils::clamp(samples[i], -1.0f, 1.0f);
-            this->buffer.addSample((int) i, startSample, sample);
+            buffer.addSample((int) i, startSample, sample);
         }
 
         ++startSample;
@@ -104,12 +118,12 @@ void PhysEdVoice::renderNextBlock(
 }
 
 void PhysEdVoice::setResonator(Resonator *resonatorToUse) {
-    this->resonator = resonatorToUse;
+    resonator = resonatorToUse;
 }
 
 
 std::vector<FType> &PhysEdVoice::getResonatorState() {
-    return this->resonator->getState();
+    return resonator->getState();
 }
 
 Resonator *PhysEdVoice::getResonator() {

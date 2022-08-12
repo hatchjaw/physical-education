@@ -26,7 +26,7 @@ void Bow::setupExcitation() {
 
     phi1 = sqrt(2 * a) * exp(.5);
     nr1 = (2 / p.k) + (2 * p.sigma0);
-    excitationCoefficient = (p.kSq * phi1) / (resonatorParameters.rho * p.A * p.schemeDivisor);
+    excitationCoefficient = (p.kSq * phi1) / (resonatorParameters.rho.getCurrent() * p.A * p.schemeDivisor);
 }
 
 void Bow::applyExcitation(std::vector<FType *> &state) {
@@ -66,7 +66,7 @@ void Bow::applyExcitation(std::vector<FType *> &state) {
 
         auto vRel = 0.0, vRelPrev = 0.0;
         auto f = force * FORCE_SCALAR;
-        auto nrScaledForce = f / (resonatorParameters.rho * p.A);
+        auto nrScaledForce = f / (resonatorParameters.rho.getCurrent() * p.A);
 
         for (unsigned int i = 0; i < MAX_NR_ITERATIONS; ++i) {
             auto vRelPrevSq = pow(vRelPrev, 2);

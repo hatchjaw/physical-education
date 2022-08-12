@@ -4,6 +4,9 @@
 
 #include "DynamicResonator.h"
 
+
+//DynamicResonator::DynamicResonator() : Resonator() { }
+
 void DynamicResonator::initialiseState() {
     Utils::setupVectorPointers(u, uStates, stencilDimensions.second, Mu + 1);
     Utils::setupVectorPointers(w, wStates, stencilDimensions.second, parameters.derived.N - Mu + 1);
@@ -48,6 +51,8 @@ void DynamicResonator::initialiseModel(FType sampleRate) {
 
 void DynamicResonator::updateState() {
     jassert(isInitialised);
+    computeDerivedParameters();
+    computeCoefficients();
     adjustGridDimensions();
     computeScheme();
     doDisplacementCorrection();
@@ -55,6 +60,7 @@ void DynamicResonator::updateState() {
     advanceTimestep();
 }
 
+// TODO: DRY this out
 FType DynamicResonator::getOutputAtPosition(unsigned long outputPositionIndex) {
     jassert(isInitialised);
     jassert(outputPositionIndex < normalisedOutputPositions.size());

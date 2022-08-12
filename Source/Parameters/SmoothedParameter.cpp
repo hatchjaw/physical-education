@@ -39,6 +39,19 @@ T &SmoothedParameter<T>::getCurrent() {
     return current;
 }
 
+template<typename T>
+SmoothedParameter<T> &SmoothedParameter<T>::operator=(const T &p) {
+    set(p, true);
+    return *this;
+}
+
+template<typename T>
+SmoothedParameter<T>::SmoothedParameter(const SmoothedParameter &p) {
+    current = p.current;
+    target = p.target;
+    q = p.q;
+}
+
 template
 class SmoothedParameter<FType>;
 

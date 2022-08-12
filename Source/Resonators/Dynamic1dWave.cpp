@@ -5,7 +5,7 @@
 #include "Dynamic1dWave.h"
 
 Dynamic1dWave::Dynamic1dWave(Exciter *exciterToUse) :
-        DynamicResonator(std::make_pair(3, 3), exciterToUse) {}
+        DynamicResonator({3, 3}, exciterToUse) {}
 
 FType Dynamic1dWave::getOutputScalar() {
     switch (outputMode) {
@@ -17,8 +17,6 @@ FType Dynamic1dWave::getOutputScalar() {
 }
 
 void Dynamic1dWave::computeCoefficients() {
-    setDerivedParameters();
-
     auto p = &parameters.derived;
 
     // Grid-spacing, from stability condition.
@@ -57,8 +55,6 @@ void Dynamic1dWave::computeCoefficients() {
 }
 
 void Dynamic1dWave::computeScheme() {
-    computeCoefficients();
-
     // VIRTUAL GRIDPOINTS
     // Create quadratic interpolator.
     auto am{alpha - 1.};
@@ -122,26 +118,27 @@ void Dynamic1dWave::computeScheme() {
 }
 
 void Dynamic1dWave::setTension(FType tension) {
-    parameters.T.set(tension, true);
-    setDerivedParameters();
+    parameters.T = tension;
+    computeDerivedParameters();
 }
 
 void Dynamic1dWave::setDensity(FType density) {
     parameters.rho = density;
-    setDerivedParameters();
+    computeDerivedParameters();
 }
 
 void Dynamic1dWave::setRadius(FType radius) {
     parameters.r = radius;
-    setDerivedParameters();
+    computeDerivedParameters();
 }
 
-void Dynamic1dWave::setDerivedParameters() {
-    if (parameters.r > 0.0) {
+void Dynamic1dWave::computeDerivedParameters() {
+    auto r = parameters.r.getNext();
+    if (r > 0.0) {
         auto p = &parameters.derived;
-        p->A = M_PI * pow(parameters.r, 2);
+        p->A = M_PI * pow(r, 2);
 
-        auto rhoA = parameters.rho * p->A;
+        auto rhoA = parameters.rho.getNext() * p->A;
         if (rhoA > 0.0) {
             p->c = sqrt(parameters.T.getNext() / rhoA);
             p->cSq = pow(p->c, 2);

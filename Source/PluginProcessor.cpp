@@ -15,6 +15,8 @@
 #include "Exciters/RaisedCosine.h"
 #include "Exciters/Bow.h"
 #include "Resonators/Dynamic1dWave.h"
+#include "Resonators/Dynamic2dWave.h"
+#include "Exciters/RaisedCosine2D.h"
 
 //==============================================================================
 PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
@@ -42,8 +44,8 @@ PhysicalEducationAudioProcessor::PhysicalEducationAudioProcessor()
         physEdSynth.addVoice(voice);
     }
 
-    currentResonator = "Stiff String";
-    currentExciter = "Bow";
+    currentResonator = ResonatorType::StiffString;
+    currentExciter = ExcitationType::Bow;
 }
 
 PhysicalEducationAudioProcessor::~PhysicalEducationAudioProcessor() {
@@ -153,13 +155,13 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    auto resonatorType = Constants::RESONATOR_TYPES[static_cast<int>(
+    auto resonatorType = static_cast<ResonatorType>(
             apvts.getRawParameterValue(Constants::ParameterIDs::RESONATOR_TYPE)->load()
-    )];
+    );
 
-    auto excitationType = Constants::EXCITATION_TYPES[static_cast<int>(
+    auto excitationType = static_cast<ExcitationType>(
             apvts.getRawParameterValue(Constants::ParameterIDs::EXCITATION_TYPE)->load()
-    )];
+    );
 
     auto outPos1 = apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_1)->load();
     auto outPos2 = apvts.getRawParameterValue(Constants::ParameterIDs::OUT_POS_2)->load();
@@ -178,19 +180,38 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
     for (int i = 0; i < physEdSynth.getNumVoices(); ++i) {
         if (auto voice = dynamic_cast<PhysEdVoice *>(physEdSynth.getVoice(i))) {
             auto resonator = voice->getResonator();
+            // TODO agh, this is dreadful
+            auto is2D = currentResonator == ResonatorType::Dynamic2dWave;
 
             // Resonator change.
             if (resonatorType != currentResonator) {
-                if (resonatorType == "Stiff String") {
-                    resonator = new StiffString();
-                } else if (resonatorType == "Dynamic 1D Wave") {
-                    resonator = new Dynamic1dWave();
+                switch (resonatorType) {
+                    case ResonatorType::StiffString:
+                        resonator = new StiffString();
+                        is2D = false;
+                        break;
+                    case ResonatorType::Dynamic1dWave:
+                        resonator = new Dynamic1dWave();
+                        is2D = false;
+                        break;
+                    case ResonatorType::Dynamic2dWave:
+                        resonator = new Dynamic2dWave();
+                        is2D = true;
+                        break;
                 }
 
-                if (currentExciter == "Bow") {
-                    resonator->setExciter(new Bow(resonator->getParameters()));
-                } else if (currentExciter == "Raised Cosine") {
-                    resonator->setExciter(new RaisedCosine(resonator->getParameters()));
+                switch (currentExciter) {
+                    case ExcitationType::RaisedCosine:
+                        if (is2D) {
+                            resonator->setExciter(new RaisedCosine2D(resonator->getParameters()));
+                        } else {
+                            resonator->setExciter(new RaisedCosine(resonator->getParameters()));
+                        }
+
+                        break;
+                    case ExcitationType::Bow:
+                        resonator->setExciter(new Bow(resonator->getParameters()));
+                        break;
                 }
 
                 voice->setResonator(resonator);
@@ -198,22 +219,31 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
                 currentResonator = resonatorType;
             }
 
-            resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
+            if (auto dynamicResonator = dynamic_cast<DynamicResonator *>(resonator)) {
+                dynamicResonator->setTension(tension);
+            } else {
+                resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
+            }
+
             resonator->setOutputMode(outputMode);
             resonator->setDamperParameters(damperPos, damperStiffness, damperNonlinearity,
                                            damperLoss);
 
-            if (auto dynamicResonator = dynamic_cast<DynamicResonator *>(resonator)) {
-                dynamicResonator->setTension(tension);
-            }
-
             // Exciter change.
             if (excitationType != currentExciter) {
-                if (excitationType == "Bow") {
-                    resonator->setExciter(new Bow(resonator->getParameters()));
-                } else if (excitationType == "Raised Cosine") {
-                    resonator->setExciter(new RaisedCosine(resonator->getParameters()));
+                switch (excitationType) {
+                    case ExcitationType::RaisedCosine:
+                        if (is2D) {
+                            resonator->setExciter(new RaisedCosine2D(resonator->getParameters()));
+                        } else {
+                            resonator->setExciter(new RaisedCosine(resonator->getParameters()));
+                        }
+                        break;
+                    case ExcitationType::Bow:
+                        resonator->setExciter(new Bow(resonator->getParameters()));
+                        break;
                 }
+
                 currentExciter = excitationType;
             }
 
@@ -278,7 +308,7 @@ PhysicalEducationAudioProcessor::createParams() {
             Constants::ParameterIDs::RESONATOR_TYPE,
             "Resonator",
             Constants::RESONATOR_TYPES,
-            1
+            2
     ));
 
     params.push_back(std::make_unique<juce::AudioParameterChoice>(

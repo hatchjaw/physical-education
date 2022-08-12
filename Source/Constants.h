@@ -39,4 +39,20 @@ struct Constants {
     static const juce::StringArray EXCITATION_TYPES;
 };
 
+/**
+ * Resonator types.
+ * Must match indexing of Constants::RESONATOR_TYPES.
+ * TODO: find a better way of doing this
+ */
+enum class ResonatorType {
+    StiffString,
+    Dynamic1dWave,
+    Dynamic2dWave
+};
+
+enum class ExcitationType {
+    RaisedCosine,
+    Bow
+};
+
 #endif //PHYSICAL_EDUCATION_CONSTANTS_H

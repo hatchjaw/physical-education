@@ -41,7 +41,7 @@ struct ModelParameters {
         /**
          * Number of grid **intervals**, i.e. number of spatial gridpoints = N+1
          */
-        unsigned int N{0};
+        unsigned int N{0}, Mxu{0}, Myu{0};
         /**
          * Combined coefficients
          */
@@ -67,27 +67,32 @@ struct ModelParameters {
      */
     FType T60_0{0.0};
     /**
-     * Frequency-dependent decay...
-     * TODO: needs to be calculated differently.
+     * Frequency-dependent decay
      * NB. for stability, T60_1 should be greater than T60_0.
      */
     FType T60_1{0.0};
     /**
      * Density (kg/m^3)
      */
-    FType rho{0.0};
+    SmoothedParameter<FType> rho{0.0};
     /**
      * Cross-sectional radius (m)
      */
-    FType r{0.0};
+    SmoothedParameter<FType> r{0.0};
     /**
-     * Tension (N)
+     * Tension (N for 1D systems, N/m for 2D)
      */
     SmoothedParameter<FType> T{0.0, 1e-4};
     /**
      * Young's modulus (Pa)
      */
     FType E{0.0};
+
+    /**
+     * Thickness (m)
+     */
+    SmoothedParameter<FType> H{0.0};
+
     DerivedParameters derived;
 };
 

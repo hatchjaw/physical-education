@@ -12,7 +12,11 @@ class SmoothedParameter {
 public:
     explicit SmoothedParameter(T initialValue, T qVal = DEFAULT_Q);
 
+    SmoothedParameter(const SmoothedParameter &p);
+
     void set(T targetValue, bool skipSmoothing = false);
+
+    SmoothedParameter<T> &operator=(const T &p);
 
     T getNext();
 

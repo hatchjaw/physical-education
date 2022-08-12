@@ -6,13 +6,12 @@
 #define PHYSICAL_EDUCATION_BOW_H
 
 
-#include "Exciter.h"
+#include "Exciter1D.h"
 #include "../Resonators/Resonator.h"
 
-class Bow : public Exciter {
+class Bow : public Exciter1D {
+    using Exciter1D::Exciter1D;
 public:
-    using Exciter::Exciter;
-
     void setupExcitation() override;
 
     void setFriction(FType friction);

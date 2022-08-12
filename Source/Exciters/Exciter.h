@@ -18,12 +18,6 @@ public:
 
     virtual void setupExcitation() = 0;
 
-    virtual void startExcitation(
-            float excitationPosition,
-            float excitationForce,
-            float excitationVelocity
-    );
-
     float getVelocity() const;
 
     float getForce() const;
@@ -37,7 +31,6 @@ protected:
 
     virtual void stopExcitation();
 
-    SmoothedParameter<float> position{0.f};
     float force{0.f}, velocity{0.f};
 
     bool isExciting{false};

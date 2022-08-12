@@ -26,7 +26,8 @@ const juce::StringRef Constants::ParameterIDs::TENSION = "TENSION";
 
 const juce::StringArray Constants::RESONATOR_TYPES = {
         "Stiff String",
-        "Dynamic 1D Wave"
+        "Dynamic 1D Wave",
+        "Dynamic 2D Wave"
 };
 
 const juce::StringArray Constants::EXCITATION_TYPES = {
