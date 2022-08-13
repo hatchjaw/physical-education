@@ -27,6 +27,8 @@ protected:
 
     FType getOutputAtPosition(unsigned long outputPositionIndex) override;
 
+    void advanceTimestep() override;
+
     unsigned int Nx{0}, NxPrev{0}, Ny{0}, NyPrev{0};
     FType Lx{0.}, Ly{0.}, NxFrac{0.}, NyFrac{0.}, alphaX{0.}, alphaY{0.};
 

@@ -38,7 +38,7 @@ void Bow::applyExcitation(std::vector<FType *> &state) {
     auto floatN = static_cast<float>(p.N);
     // Always update the bow position, irrespective of whether excitation is
     // active.
-    auto bowIndex = Utils::clamp(floatN * position.getNext(), 4, floatN - 4);
+    auto bowIndex = Utils::clamp(floatN * position.x.getNext(), 4, floatN - 4);
 
     if (isExciting) {
         auto alpha = modf(bowIndex, &bowIndex);

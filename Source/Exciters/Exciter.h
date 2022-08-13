@@ -8,6 +8,7 @@
 #include <vector>
 #include "../Parameters/ModelParameters.h"
 #include "../Parameters/SmoothedParameter.h"
+#include "../Grid/SpatialDomain.h"
 // No need to include Resonator.h for the friend class declaration, as this
 // header has been included from that very file.
 // Including it confuses the compiler.
@@ -32,6 +33,8 @@ protected:
     virtual void stopExcitation();
 
     float force{0.f}, velocity{0.f};
+
+    ContinuousPosition position;
 
     bool isExciting{false};
 

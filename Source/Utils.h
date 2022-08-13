@@ -81,16 +81,16 @@ public:
 
     static FType interpolate2D(
             const FType *u,
-            unsigned int Mx,
+            unsigned int lLength,
             std::pair<unsigned int, unsigned int> readPos,
             std::pair<FType, FType> alpha
     ) {
         auto l = readPos.first;
         auto m = readPos.second;
-        return u[m * Mx + l] * (1 - alpha.first) * (1 - alpha.second) +
-               u[m * Mx + l + 1] * (1 - alpha.first) * alpha.second +
-               u[(m + 1) * Mx + l] * alpha.first * (1 - alpha.second) +
-               u[(m + 1) * Mx + l + 1] * alpha.first * alpha.second;
+        return u[m * lLength + l] * (1 - alpha.first) * (1 - alpha.second) +
+               u[m * lLength + l + 1] * (1 - alpha.first) * alpha.second +
+               u[(m + 1) * lLength + l] * alpha.first * (1 - alpha.second) +
+               u[(m + 1) * lLength + l + 1] * alpha.first * alpha.second;
     }
 
     /**

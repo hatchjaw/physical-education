@@ -16,10 +16,6 @@ public:
             float excitationForce,
             float excitationVelocity
     );
-protected:
-    SmoothedParameter<float> position{0.f};
-
-    friend class Resonator;
 };
 
 

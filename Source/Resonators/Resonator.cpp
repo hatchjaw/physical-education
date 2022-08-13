@@ -230,21 +230,13 @@ FType Resonator::getDamperPosition() {
 }
 
 FType Resonator::getExcitationPosition() {
-    if (auto ex = dynamic_cast<Exciter1D *>(exciter)) {
-        return ex->position.getCurrent();
-    } else if (auto ex = dynamic_cast<Exciter2D *>(exciter)) {
-        // TODO: sort this out
-        return ex->position.first.getCurrent();
-    }
+    // TODO: what about y-position?
+    return exciter->position.x.getCurrent();
 }
 
 void Resonator::updateSmoothedParams() {
-    if (auto ex = dynamic_cast<Exciter1D *>(exciter)) {
-        ex->position.getNext();
-    } else if (auto ex = dynamic_cast<Exciter2D *>(exciter)) {
-        ex->position.first.getNext();
-        ex->position.second.getNext();
-    }
+    exciter->position.x.getNext();
+    exciter->position.y.getNext();
 
     damper.position.getNext();
     damper.sigmaP.getNext();

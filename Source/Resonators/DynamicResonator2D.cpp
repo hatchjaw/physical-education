@@ -100,7 +100,8 @@ FType DynamicResonator2D::getOutputAtPosition(unsigned long outputPositionIndex)
     auto alphY = modf(positionY, &readPosY);
 
     // Get the displacement, interpolated around the read position.
-    auto displacement = Utils::interpolate2D(u[0], parameters.derived.Mxu, {readPosX, readPosY}, {alphX, alphY});
+//    auto displacement = Utils::interpolate2D(u[0], parameters.derived.Mxu+1, {readPosX, readPosY}, {alphX, alphY});
+    auto displacement = u[0][3 * (parameters.derived.Mxu+1) + 5];
 
     // Save it to the displacement buffer.
     uOut[0][outputPositionIndex] = displacement;
@@ -124,4 +125,10 @@ FType DynamicResonator2D::getOutputAtPosition(unsigned long outputPositionIndex)
         default:
             jassertfalse;
     }
+}
+
+void DynamicResonator2D::advanceTimestep() {
+    DynamicResonator::advanceTimestep();
+    Utils::pointerSwap(v);
+    Utils::pointerSwap(z);
 }

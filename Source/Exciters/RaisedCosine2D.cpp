@@ -8,8 +8,8 @@ void RaisedCosine2D::startExcitation(std::pair<float, float> excitationPosition,
                                      float excitationForce,
                                      float excitationVelocity) {
     Exciter2D::startExcitation(excitationPosition, excitationForce, excitationVelocity);
-    position.first.set(excitationPosition.first, true);
-    position.second.set(excitationPosition.second, true);
+    position.x.set(excitationPosition.first, true);
+    position.y.set(excitationPosition.second, true);
 
     // Keep the width sensible relative to the total number of grid-points, and
     // respect the boundary conditions.
@@ -22,15 +22,15 @@ void RaisedCosine2D::startExcitation(std::pair<float, float> excitationPosition,
     auto halfWidth = .5f * excitationWidth;
 
     // Calculate the excitation position as a proportion of N.
-    auto posX = Utils::clamp(position.first.getNext(), 0.f, 1.f);
-    auto posY = Utils::clamp(position.second.getNext(), 0.f, 1.f);
+    auto posX = Utils::clamp(position.x.getNext(), 0.f, 1.f);
+    auto posY = Utils::clamp(position.y.getNext(), 0.f, 1.f);
     // Find the nearest integer start index; also ensure the excitation can't
     // exceed the bounds of the grid, and respect the boundary conditions.
-    start.first = static_cast<unsigned int>(std::min(
+    start.l = static_cast<unsigned int>(std::min(
             std::max(static_cast<int>(floor(static_cast<float>(p.Mxu) * posX - halfWidth)), 2),
             static_cast<int>(p.Mxu - width)
     ));
-    start.second = static_cast<unsigned int>(std::min(
+    start.m = static_cast<unsigned int>(std::min(
             std::max(static_cast<int>(floor(static_cast<float>(p.Myu) * posY - halfWidth)), 2),
             static_cast<int>(p.Myu - width)
     ));
@@ -50,13 +50,20 @@ void RaisedCosine2D::applyExcitation(std::vector<FType *> &state) {
                           (1 - cos((M_PI * sampleCount) / (durationSamples * .5)));
         auto halfWidth = .5f * static_cast<float>(width);
 
+        // Number of gridpoints in the l spatial domain.
+        auto lLength = p.Mxu + 1;
+
         // Apply the excitation by adding displacement to the identified range of
         // grid-points.
-        for (unsigned int l = 0; l < width; ++l) {
-            auto cos2D = 1 - cos((M_PI * l) / halfWidth);
-            for (unsigned int m = 0; m < width; ++m) {
-                state[0][p.Mxu * (m + start.second) + l + start.first] -= forceToUse * cos2D * (1 - cos((M_PI * m) /
-                                                                                                        halfWidth));
+        for (unsigned int m = 0; m < width; ++m) {
+            // Raised cosine for the y dimension...
+            auto cos2D = 1 - cos((M_PI * m) / halfWidth);
+            auto rowStart = lLength * (m + start.m) + start.l;
+            for (unsigned int l = 0; l < width; ++l) {
+                auto lm = rowStart + l;
+                // ...multiplied by a raised cosine for the x dimension, *and*
+                // the temporal raised cosine calculated above.
+                state[0][lm] -= forceToUse * cos2D * (1 - cos((M_PI * l) / halfWidth));
             }
         }
 

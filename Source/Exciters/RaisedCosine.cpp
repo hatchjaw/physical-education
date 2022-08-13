@@ -8,7 +8,7 @@ void RaisedCosine::startExcitation(float excitationPosition,
                                    float excitationForce,
                                    float excitationVelocity) {
     Exciter1D::startExcitation(excitationPosition, excitationForce, excitationVelocity);
-    position.set(excitationPosition, true);
+    position.x.set(excitationPosition, true);
 
     // Keep the width sensible relative to the total number of grid-points, and
     // respect the boundary conditions.
@@ -21,7 +21,7 @@ void RaisedCosine::startExcitation(float excitationPosition,
     auto halfWidth = .5f * excitationWidth;
 
     // Calculate the excitation position as a proportion of N.
-    auto pos = Utils::clamp(position.getNext(), 0.f, 1.f);
+    auto pos = Utils::clamp(position.x.getNext(), 0.f, 1.f);
     // Find the nearest integer start index; also ensure the excitation can't
     // exceed the bounds of the grid, and respect the boundary conditions.
     start = static_cast<unsigned int>(std::min(

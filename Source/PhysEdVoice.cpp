@@ -17,9 +17,8 @@ bool PhysEdVoice::canPlaySound(SynthesiserSound *sound) {
 }
 
 void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numOutputChannels) {
-    resonator->setDecayTimes(12.5, 1.3323);
-
     if (auto model = dynamic_cast<StiffString *>(resonator)) {
+        model->setDecayTimes(12.5, 1.3323);
         model->setDensity(7850.);
         model->setRadius(.0005);
         model->setTension(100.);
@@ -31,10 +30,11 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         model->setRadius(9e-4);
         model->setTension(1000.);
     } else if (auto model = dynamic_cast<Dynamic2dWave *>(resonator)) {
+        model->setDecayTimes(30., 20.);
         model->setDimensions({.95, 1.05});
-        model->setTension(5e3, true);
+        model->setTension(1000., true);
         model->setDensity(100, true);
-        model->setThickness(5e-5, true);
+        model->setThickness(5e-6, true);
     }
 
     if (auto exciter = dynamic_cast<Bow *>(resonator->getExciter())) {

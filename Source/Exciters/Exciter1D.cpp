@@ -7,7 +7,7 @@
 void Exciter1D::startExcitation(float excitationPosition,
                               float excitationForce,
                               float excitationVelocity) {
-    position.set(excitationPosition);
+    position.x.set(excitationPosition);
     force = excitationForce;
     velocity = excitationVelocity;
     isExciting = true;

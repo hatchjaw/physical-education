@@ -28,6 +28,7 @@ void DynamicResonator::setTension(float tension) {
 void DynamicResonator::initialiseModel(FType sampleRate) {
     parameters.derived.k = 1.0 / sampleRate;
     parameters.derived.kSq = pow(parameters.derived.k, 2);
+    computeDerivedParameters();
     computeCoefficients();
 
     // Spatial dimensions

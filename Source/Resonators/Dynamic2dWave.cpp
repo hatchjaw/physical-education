@@ -11,9 +11,9 @@ Dynamic2dWave::Dynamic2dWave(Exciter *exciterToUse) :
 FType Dynamic2dWave::getOutputScalar() {
     switch (outputMode) {
         case DISPLACEMENT:
-            return 1;
+            return .1;
         case VELOCITY:
-            return 1e-4;
+            return 1e-5;
     }
 }
 
@@ -92,10 +92,11 @@ void Dynamic2dWave::computeScheme() {
     auto p = parameters.derived;
     unsigned int l, m;
 
-    for (m = 1; m < p.Myu; ++m) {
-        auto mc = m * p.Mxu, mm = (m - 1) * p.Mxu, mp = (m + 1) * p.Mxu;
+    auto lWidth = p.Mxu + 1;
+    for (m = 1; m < p.Myu - 1; ++m) {
+        auto mc = m * lWidth, mm = (m - 1) * lWidth, mp = (m + 1) * lWidth;
 
-        for (l = 1; l < p.Mxu; ++l) {
+        for (l = 1; l < p.Mxu - 1; ++l) {
             auto lm = mc + l, // u_{l,m}
             lmm1 = mm + l, // u_{l,m-1}
             lmp1 = mp + l, // u_{l,m+1}
@@ -115,5 +116,23 @@ void Dynamic2dWave::doDisplacementCorrection() {
 }
 
 void Dynamic2dWave::adjustGridDimensions() {
+    auto p = parameters.derived;
 
+    if (Nx != NxPrev) {
+        auto diff = static_cast<int>(NxPrev) - static_cast<int>(Nx);
+        jassert(abs(diff) == 1);
+
+        p.Mxu = Nx - 1;
+    }
+
+    if (Ny != NyPrev) {
+        auto diff = static_cast<int>(NyPrev) - static_cast<int>(Ny);
+        jassert(abs(diff) == 1);
+
+        p.Myu = Ny - 1;
+    }
+
+    // Store current N to check against next iteration.
+    NxPrev = Nx;
+    NyPrev = Ny;
 }

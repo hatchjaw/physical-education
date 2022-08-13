@@ -16,11 +16,6 @@ public:
     virtual void startExcitation(std::pair<float, float> excitationPosition,
                                  float excitationForce,
                                  float excitationVelocity);
-
-protected:
-    std::pair<SmoothedParameter<float>, SmoothedParameter<float>> position{0.f, 0.f};
-
-    friend class Resonator;
 };
 
 

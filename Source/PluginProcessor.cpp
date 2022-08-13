@@ -221,8 +221,13 @@ void PhysicalEducationAudioProcessor::processBlock(juce::AudioBuffer<float> &buf
 
             if (auto dynamicResonator = dynamic_cast<DynamicResonator *>(resonator)) {
                 dynamicResonator->setTension(tension);
+            }
+
+            if (auto r = dynamic_cast<DynamicResonator2D *>(resonator)) {
+                r->setOutputPositions({{outPos1, outPos1},
+                                       {outPos2, outPos2}});
             } else {
-                resonator->setOutputPositions(std::vector<float>{outPos1, outPos2});
+                resonator->setOutputPositions({outPos1, outPos2});
             }
 
             resonator->setOutputMode(outputMode);

@@ -7,8 +7,8 @@
 void Exciter2D::startExcitation(std::pair<float, float> excitationPosition,
                                 float excitationForce,
                                 float excitationVelocity) {
-    position.first.set(excitationPosition.first);
-    position.second.set(excitationPosition.second);
+    position.x.set(excitationPosition.first);
+    position.y.set(excitationPosition.second);
     force = excitationForce;
     velocity = excitationVelocity;
     isExciting = true;
