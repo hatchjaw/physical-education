@@ -17,8 +17,8 @@ DynamicResonator2D::DynamicResonator2D(
 void DynamicResonator2D::initialiseState() {
     auto p = parameters.derived;
     Utils::setupVectorPointers(u, uStates, std::get<2>(stencilDimensions), (p.Mxu + 1) * (p.Myu + 1));
-    Utils::setupVectorPointers(v, vStates, std::get<2>(stencilDimensions), (p.Mxu + 1) * (Nx - p.Mxu + 1));
-    Utils::setupVectorPointers(w, wStates, std::get<2>(stencilDimensions), (p.Myu + 1) * (Ny - p.Myu + 1));
+    Utils::setupVectorPointers(v, vStates, std::get<2>(stencilDimensions), (p.Myu + 1) * (Nx - p.Mxu + 1));
+    Utils::setupVectorPointers(w, wStates, std::get<2>(stencilDimensions), (p.Mxu + 1) * (Ny - p.Myu + 1));
     Utils::setupVectorPointers(z, zStates, std::get<2>(stencilDimensions), (Nx - p.Mxu + 1) * (Ny - p.Myu + 1));
 }
 

@@ -14,6 +14,7 @@
 #include "UI/DamperParamsComponent.h"
 #include "UI/ResonatorTypeComponent.h"
 #include "UI/Wave1dParamsComponent.h"
+#include "UI/Wave2dParamsComponent.h"
 
 class PhysicalEducationAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
@@ -40,6 +41,7 @@ private:
     ExcitationTypeComponent excitationTypeComponent;
     DamperParamsComponent damperParamsComponent;
     Wave1dParamsComponent wave1dParamsComponent;
+    Wave2dParamsComponent wave2dParamsComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PhysicalEducationAudioProcessorEditor)
 };

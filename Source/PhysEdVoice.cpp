@@ -33,7 +33,7 @@ void PhysEdVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numO
         model->setDecayTimes(30., 20.);
         model->setDimensions({.95, 1.05});
         model->setTension(1000., true);
-        model->setDensity(100, true);
+        model->setDensity(50, true);
         model->setThickness(5e-6, true);
     }
 

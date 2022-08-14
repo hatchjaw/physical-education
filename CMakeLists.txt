@@ -96,7 +96,8 @@ target_sources(PhysicalEducation
         Source/UI/OutputModeComponent.cpp
         Source/UI/FrictionSliderComponent.cpp
         Source/UI/DamperParamsComponent.cpp
-        Source/UI/Wave1dParamsComponent.cpp)
+        Source/UI/Wave1dParamsComponent.cpp
+        Source/UI/Wave2dParamsComponent.cpp)
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use

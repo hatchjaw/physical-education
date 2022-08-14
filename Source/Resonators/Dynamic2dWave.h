@@ -30,6 +30,10 @@ protected:
     void doDisplacementCorrection() override;
 
     void adjustGridDimensions() override;
+
+private:
+    bool doZ{false};
+    int rateLimit{1};
 };
 
 
