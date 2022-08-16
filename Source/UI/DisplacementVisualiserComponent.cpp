@@ -7,6 +7,8 @@
 #include "../Exciters/RaisedCosine.h"
 #include "../Resonators/StiffString.h"
 #include "../Resonators/Dynamic1dWave.h"
+#include "../Exciters/RaisedCosine2D.h"
+#include "../Resonators/Dynamic2dWave.h"
 
 DisplacementVisualiserComponent::DisplacementVisualiserComponent(Resonator *&r) :
         resonator(r) {
@@ -38,7 +40,7 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
                 DAMPER_INDICATOR_DIAMETER,
                 DAMPER_INDICATOR_DIAMETER);
     } else if (auto dynamic1dWave = dynamic_cast<Dynamic1dWave *>(resonator)) {
-        gridSpacing = static_cast<float>(resonator->getGridSpacing() / resonator->getLength());
+        gridSpacingX = static_cast<float>(resonator->getGridSpacing() / resonator->getLength());
         // This isn't pretty, but it's one way of avoiding drawing an out-of-
         // date w, thus giving the appearance that displacement correction isn't
         // working.
@@ -53,6 +55,16 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
         g.strokePath(path, PathStrokeType(2.0f));
         path = generateStatePathStatic(w);
         g.strokePath(path, PathStrokeType(2.0f));
+    } else if (auto wave2d = dynamic_cast<Dynamic2dWave *>(resonator)) {
+//        auto uState = wave2d->getState();
+//        std::vector<FType> u(uState.size());
+//        std::copy(uState.begin(), uState.end(), u.begin());
+//        auto dimensions = wave2d->getDimensions();
+//        auto h = wave2d->getGridSpacing();
+//        gridSpacingX = static_cast<float>(resonator->getGridSpacing() / dimensions.x.getCurrent());
+//        gridSpacingY = static_cast<float>(resonator->getGridSpacing() / dimensions.y.getCurrent());
+//        auto rects = visualise2dDisplacement(u);
+//        g.fillRectList(rects);
     }
 
     // Draw excitation
@@ -69,6 +81,14 @@ void DisplacementVisualiserComponent::paint(juce::Graphics &g) {
                 BOW_INDICATOR_HEIGHT
         );
     } else if (auto cos = dynamic_cast<RaisedCosine *>(exciter)) {
+        g.fillEllipse(
+                PADDING_HORIZONTAL + excitationPos * (width - 2.f * PADDING_HORIZONTAL) -
+                DAMPER_INDICATOR_DIAMETER * .5f,
+                (height - DAMPER_INDICATOR_DIAMETER) * .5f,
+                DAMPER_INDICATOR_DIAMETER,
+                DAMPER_INDICATOR_DIAMETER
+        );
+    } else if (auto cos2d = dynamic_cast<RaisedCosine2D *>(exciter)) {
         g.fillEllipse(
                 PADDING_HORIZONTAL + excitationPos * (width - 2.f * PADDING_HORIZONTAL) -
                 DAMPER_INDICATOR_DIAMETER * .5f,
@@ -147,7 +167,7 @@ juce::Path DisplacementVisualiserComponent::generateStatePathDynamic(std::vector
     auto N = state.size();
 
     // Visual spacing between grid points
-    auto spacing = (static_cast<float>(this->getWidth()) - PADDING_HORIZONTAL * 2.f) * gridSpacing;
+    auto spacing = (static_cast<float>(this->getWidth()) - PADDING_HORIZONTAL * 2.f) * gridSpacingX;
     auto x = PADDING_HORIZONTAL + spacing;
 
     for (unsigned long l = 1; l < N; l++) {
@@ -186,7 +206,7 @@ juce::Path DisplacementVisualiserComponent::generateStatePathStatic(std::vector<
             static_cast<float>(-state[l]) * verticalScaling + stringEquilibrium
     );
 
-    auto spacing = (static_cast<float>(this->getWidth()) - PADDING_HORIZONTAL * 2.f) * gridSpacing;
+    auto spacing = (static_cast<float>(this->getWidth()) - PADDING_HORIZONTAL * 2.f) * gridSpacingX;
     auto x = width - PADDING_HORIZONTAL - spacing;
 
     while (l-- > 0) {
@@ -203,4 +223,8 @@ juce::Path DisplacementVisualiserComponent::generateStatePathStatic(std::vector<
     }
 
     return path;
+}
+
+juce::RectangleList<float> DisplacementVisualiserComponent::visualise2dDisplacement(std::vector<FType> state) {
+
 }

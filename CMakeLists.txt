@@ -138,7 +138,7 @@ target_link_libraries(PhysicalEducation
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
-if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Sign targets to allow debugging without elevated privileges
     add_custom_command(TARGET PhysicalEducation
             POST_BUILD

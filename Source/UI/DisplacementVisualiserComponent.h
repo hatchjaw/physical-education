@@ -40,8 +40,10 @@ private:
 
     juce::Path generateStatePathStatic(std::vector<FType> &state);
 
+    juce::RectangleList<float> visualise2dDisplacement(std::vector<FType> state);
+
     // TODO: parameterise the scaling factor.
-    float gridSpacing{0.f}, scalingFactor{250.f};
+    float gridSpacingX{0.f}, gridSpacingY{0.f}, scalingFactor{250.f};
 };
 
 

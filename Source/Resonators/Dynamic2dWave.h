@@ -20,6 +20,8 @@ public:
 
     void setThickness(FType radius, bool force = false);
 
+    ContinuousPosition getDimensions();
+
 protected:
     void computeDerivedParameters() override;
 
@@ -31,9 +33,10 @@ protected:
 
     void adjustGridDimensions() override;
 
+    void updateState() override;
+
 private:
-    bool doZ{false};
-    int rateLimit{1};
+    int rateLimit{10}, rateCounter{0};
 };
 
 
